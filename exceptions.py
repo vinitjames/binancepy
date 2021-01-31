@@ -1,12 +1,11 @@
-import Exception
+
 from  requests.models import Response
 
 class BinanceAPIException(Exception):
     def __init__(self, response: Response):
         self.code = 0
         try:
-            json_res = Response.json()
-            self.code = json_res['']
+            json_res = response.json()
         except ValueError:
             self.message = 'Invalid JSON error message from Binance: {}'.format(response.text)
         else:
@@ -20,4 +19,9 @@ class BinanceAPIException(Exception):
         return 'Binance API Error(code=%s): %s' % (self.code, self.messaage)
 
 
+class BinanceRequestException(Exception):
+    def __init__(self, message):
+        self.message = message
         
+    def __str__(self):
+        return 'BinanceRequestException: %s' % self.message
