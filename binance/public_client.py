@@ -1,7 +1,7 @@
-from api_def import PublicAPI
+from .api_def import PublicAPI
 from requests import Session
 from requests.models import Response
-from exceptions import BinanceAPIException, BinanceRequestException
+from .exceptions import BinanceAPIException, BinanceRequestException
 
 
 class PublicClient(PublicAPI):
@@ -56,8 +56,8 @@ class PublicClient(PublicAPI):
         return self._request_public(uri)
 
     def get_symbol_info(self, symbol: str) -> dict:
-        resp_data = get_exchange_info()
-        for sym_data in resp_data['symbol']:
+        resp_data = self.get_exchange_info()
+        for sym_data in resp_data['symbols']:
             if(sym_data['symbol'] == symbol.upper()):
                 return sym_data
         return None
@@ -78,11 +78,12 @@ class PublicClient(PublicAPI):
         uri = self._create_api_uri('depth')
         return self._request_public(uri, symbol=symbol, limit=limit)
 
-    def get_avg_price(self, symbol: str = None) -> dict:
-        uri = self._create_api_uri('avgPrice')
+    def get_avg_price(self, symbol: str) -> dict:
+        #avg price does not work with v1
+        uri = self._create_api_uri('avgPrice', version='v3') 
         return self._request_public(uri, symbol=symbol)
 
-    def get_price_ticker(self, symbol: str = None) -> dict:
+    def get_24hr_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/24hr')
         if(symbol == None):
             return self._request_public(uri)
@@ -93,40 +94,28 @@ class PublicClient(PublicAPI):
         return self._request_public(uri, symbol=symbol, limit=limit)
 
     def get_agg_trades(self, symbol: str,
-                       formId: int = 0,
-                       startTime: int = 0,
-                       endTime: int = 0,
+                       formId: int = None,
+                       startTime: int = None,
+                       endTime: int = None,
                        limit: int = 500):
-        params = {}
-        params['symbol'] = symbol
-        params['limit'] = limit
-        if(formId > 0):
-            params['formId'] = formId
-        if (startTime > 0) and (endTime > 0):
-            params['startTime'] = startTime
-            params['endTime'] = endTime
-        uri = self.create_api_uri('aggTrades')
+        params = locals()
+        del params['self']
+        params = {k:v for k,v in params.items() if v is not None}
+        uri = self._create_api_uri('aggTrades')
         return self._request_public(uri, **params)
 
     def get_klines(self, symbol: str,
                    interval: str,
-                   startTime: int = 0,
-                   endTime: int = 0,
-                   limit: int = 500):
-        params = {}
-        params['symbol'] = symbol
-        params['limit'] = limit
-        if(formId > 0):
-            params['formId'] = formId
-        if (startTime > 0) and (endTime > 0):
-            params['startTime'] = startTime
-            params['endTime'] = endTime
-        uri = self.create_api_uri('aggTrades')
+                   startTime: int = None,
+                   endTime: int = None,
+                   limit: int = None):
+        
+        params = locals()
+        del params['self']
+        params = {k:v for k,v in params.items() if v is not None}
+        uri = self._create_api_uri('klines')
         return self._request_public(uri, **params)
 
 
 if __name__ == '__main__':
     pass
-    client = PublicClient()
-
-    print(client.get_orderbook_ticker('ETHEUR'))
