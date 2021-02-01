@@ -1,26 +1,25 @@
-from api_def  import PublicAPI
+from api_def import PublicAPI
 from requests import Session
 from requests.models import Response
 from exceptions import BinanceAPIException, BinanceRequestException
 
+
 class PublicClient(PublicAPI):
-    
-    def __init__(self,endpoint_version: str='', request_params:dict = None, tld: str='com'):
+
+    def __init__(self, endpoint_version: str = '', request_params: dict = None, tld: str = 'com'):
         self.API_URL = self.API_URL.format(endpoint_version, tld)
         self.session = self._init_session()
         self.request_params = request_params
-    
-    def _init_session(self) -> Session :
+
+    def _init_session(self) -> Session:
         session = Session()
-        session.headers.update({'Accept':'application/json',
-                                'User-Agent':'binance/python'})
+        session.headers.update({'Accept': 'application/json',
+                                'User-Agent': 'binance/python'})
         return session
 
-    def _create_api_uri(self, path: str, signed = False, version = PublicAPI.PUBLIC_API_VERSION):
-        if signed:
-            version = PRIVATE_API_VERSION
+    def _create_api_uri(self, path: str, version=PublicAPI.PUBLIC_API_VERSION):
         return self.API_URL + '/' + version + '/' + path
-    
+
     def _request_public(self, uri, **params):
 
         kwargs = {}
@@ -28,24 +27,23 @@ class PublicClient(PublicAPI):
         kwargs['timeout'] = 10
         if self.request_params:
             kwargs.update(self.request_params)
-        response = self.session.get(uri, **kwargs) 
+        response = self.session.get(uri, **kwargs)
         return self._handle_response(response)
-
 
     @classmethod
     def _handle_response(cls, response: Response) -> dict:
         if(type(response) != Response):
-            raise ValueError("Client Error: _handle resource was not called with Response Type")
-        if( not str(response.status_code).startswith('2')):
+            raise ValueError(
+                "Client Error: _handle resource was not called with Response Type")
+        if(not str(response.status_code).startswith('2')):
             raise BinanceAPIException(response)
 
         try:
             return response.json()
         except ValueError:
             raise BinanceRequestException(response)
-        
 
-    def ping(self) -> dict: 
+    def ping(self) -> dict:
         uri = self._create_api_uri('ping')
         return self._request_public(uri)
 
@@ -68,31 +66,31 @@ class PublicClient(PublicAPI):
         uri = self._create_api_uri('ticker/price')
         if(symbol == None):
             return self._request_public(uri)
-        return self._request_public(uri, symbol = symbol)
+        return self._request_public(uri, symbol=symbol)
 
     def get_orderbook_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/bookTicker')
         if(symbol == None):
             return self._request_public(uri)
-        return self._request_public(uri, symbol = symbol)
-    
+        return self._request_public(uri, symbol=symbol)
+
     def get_order_book(self, symbol: str, limit: int = 100):
         uri = self._create_api_uri('depth')
-        return self._request_public(uri, symbol = symbol, limit = limit)
+        return self._request_public(uri, symbol=symbol, limit=limit)
 
-    def get_avg_price(self, symbol: str = None)->dict:
+    def get_avg_price(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('avgPrice')
-        return self._request_public(uri, symbol = symbol)
+        return self._request_public(uri, symbol=symbol)
 
     def get_price_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/24hr')
         if(symbol == None):
             return self._request_public(uri)
-        return self._request_public(uri, symbol = symbol)
-        
+        return self._request_public(uri, symbol=symbol)
+
     def get_recent_trades(self, symbol: str, limit: int = 100) -> dict:
         uri = self._create_api_uri('trades')
-        return self._request_public(uri, symbol = symbol, limit = limit)
+        return self._request_public(uri, symbol=symbol, limit=limit)
 
     def get_agg_trades(self, symbol: str,
                        formId: int = 0,
@@ -104,7 +102,7 @@ class PublicClient(PublicAPI):
         params['limit'] = limit
         if(formId > 0):
             params['formId'] = formId
-        if (startTime > 0) and (endTime>0):
+        if (startTime > 0) and (endTime > 0):
             params['startTime'] = startTime
             params['endTime'] = endTime
         uri = self.create_api_uri('aggTrades')
@@ -120,16 +118,15 @@ class PublicClient(PublicAPI):
         params['limit'] = limit
         if(formId > 0):
             params['formId'] = formId
-        if (startTime > 0) and (endTime>0):
+        if (startTime > 0) and (endTime > 0):
             params['startTime'] = startTime
             params['endTime'] = endTime
         uri = self.create_api_uri('aggTrades')
         return self._request_public(uri, **params)
-    
-    
-    
+
+
 if __name__ == '__main__':
     pass
-    client = PublicClient();
-    
+    client = PublicClient()
+
     print(client.get_orderbook_ticker('ETHEUR'))
