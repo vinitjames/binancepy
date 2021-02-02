@@ -5,9 +5,9 @@ import hmac
 
 
 def create_sorted_list(data: dict) -> list:
-    data_list = [(key, value) for key, value in data.iteritems()]
+    data_list = [(key, value) for key, value in data.items()]
     data_list.sort(key=itemgetter(0))
-    return data
+    return data_list
 
 
 def generate_signature(query_string: str, api_secret: str) -> str:
@@ -18,6 +18,6 @@ def generate_signature(query_string: str, api_secret: str) -> str:
 
 def create_query_string(data: Union[dict, list]) -> str:
     if isinstance(data, dict):
-        return '&'.join(['{}={}'.format(key, value) for key, value in data.iteritems()])
+        return '&'.join(['{}={}'.format(key, value) for key, value in data.items()])
 
-    return '&'.join(['{}={}'.format(d[0], [d1]) for d in data])
+    return '&'.join(['{}={}'.format(d[0], d[1]) for d in data])
