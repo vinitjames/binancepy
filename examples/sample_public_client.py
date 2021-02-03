@@ -80,7 +80,7 @@ if __name__ == '__main__':
         Default limit value = 500
     '''
     klines = client.get_klines(symbol = 'ETHEUR',
-                               interval = client.KLINE_INTERVAL_1MONTH,
+                               interval = client.KLINE_INTERVAL_1HOUR,
                                startTime = round(time.time()*1000) - 100000000,
                                endTime = round(time.time()*1000),
                                limit=5)
