@@ -1,7 +1,10 @@
 from .api_def import PublicAPI
+from .exceptions import BinanceAPIException, BinanceRequestException
+from .utils import format_time
 from requests import Session
 from requests.models import Response
-from .exceptions import BinanceAPIException, BinanceRequestException
+from typing import Union
+
 
 
 class PublicClient(PublicAPI):
@@ -106,11 +109,15 @@ class PublicClient(PublicAPI):
 
     def get_klines(self, symbol: str,
                    interval: str,
-                   startTime: int = None,
-                   endTime: int = None,
+                   startTime: Union[int, str] = None,
+                   endTime: Union[int, str] = None,
                    limit: int = None):
         
         params = locals()
+        if(params['startTime'] != None):
+            params['startTime'] = format_time(params['startTime'])
+        if(params['endTime'] != None):
+            params['endTime'] = format_time(params['endTime'])
         del params['self']
         params = {k:v for k,v in params.items() if v is not None}
         uri = self._create_api_uri('klines')
