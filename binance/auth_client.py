@@ -444,7 +444,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         uri = self._create_api_uri('order',
                                    version=self.PRIVATE_API_VERSION)
         return self._delete(uri, signed=True, **params)
-
+    
     def cancel_all_orders(self,
                           symbol: str,
                           timestamp: int,
@@ -526,6 +526,143 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         return self._get(uri, signed=True, **params)
 
     
+    # margin endpoints
+    def transfer_margin_to_spot(self,
+                                asset: str,
+                                amount: float,
+                                recvWindow: int = None) -> dict:
+        params = locals()
+        del params['self']
+        params['type'] = 2
+        params = {k: v for k, v in params.items() if v is not None}
+        
+        uri = self._create_margin_api_uri('margin/transfer',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._post(uri, signed=True, **params)
 
+    def transfer_spot_to_margin(self,
+                                asset: str,
+                                amount: float,
+                                recvWindow: int = None) -> dict:
+        params = locals()
+        del params['self']
+        params['type'] = 1
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/transfer',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._post(uri, signed=True, **params)
+
+    def margin_account_borrow(self,
+                              asset: str,
+                              amount: float,
+                              isIsolated: bool = False,
+                              symbol: str = None,
+                              recvWindow: int = None):
+        
+        if(isIsolated == True) and (symbol == None):
+            raise ValueError("isIsolated is true but symbol not specified")
+        params = locals()
+        del params['self']
+        params['type'] = 1
+        params = {k: v for k, v in params.items() if v is not None}
+        params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
+        uri = self._create_margin_api_uri('margin/loan',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._post(uri, signed=True, **params)
+
+    def margin_account_repay(self,
+                             asset: str,
+                             amount: float,
+                             isIsolated: bool = False,
+                             symbol: str = None,
+                             recvWindow: int = None):
+        
+        if(isIsolated == True) and (symbol == None):
+            raise ValueError("isIsolated is true but symbol not specified")
+        params = locals()
+        del params['self']
+        params['type'] = 1
+        params = {k: v for k, v in params.items() if v is not None}
+        params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
+        uri = self._create_margin_api_uri('margin/repay',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._post(uri, signed=True, **params)
+
+    def query_margin_asset(self,
+                           asset: str):
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/asset',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._get(uri, signed=True, **params)
+
+    def query_cross_margin_pair(self,
+                                symbol: str):
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/pair',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._get(uri, signed=True, **params)
+
+    def get_all_margin_assets(self):
+        uri = self._create_margin_api_uri('margin/allAssets',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._get(uri, signed=True)
+
+    def get_all_cross_margin_pairs(self):
+        uri = self._create_margin_api_uri('margin/allPairs',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._get(uri, signed=True)
+
+    def query_cross_margin_price_index(self,
+                                       symbol: str):
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/priceIndex',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._get(uri, signed=True, **params)
+
+    
+    def create_margin_order(self,
+                            symbol: str,
+                            side: str,
+                            type: str,
+                            isIsolated: bool = False,
+                            timeInForce: str = None,
+                            quantity: float = None,
+                            quoteOrderQty: float = None,
+                            price: float = None,
+                            newClientOrderId: str = None,
+                            stopPrice: float = None,
+                            icebergQty: float = None,
+                            newOrderRespType: str = None,
+                            sideEffectType: str = None,
+                            recvWindow: int = None) -> dict:
+
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/order',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._post(uri, signed=True, **params)
+
+    def create_margin_order(self,
+                            symbol: str,
+                            isIsolated: bool = False,
+                            orderId:int = None,
+                            origClientOrderId: str = None,
+                            newClientOrderId: str = None,                            
+                            recvWindow: int = None) -> dict:
+
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/order',
+                                          version=self.PRIVATE_API_VERSION)
+        return self._delete(uri, signed=True, **params)
+    
 if __name__ == '__main__':
     pass
