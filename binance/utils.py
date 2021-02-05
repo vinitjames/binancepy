@@ -17,7 +17,7 @@ def create_sorted_list(data: dict) -> list:
 def generate_signature(query_string: str, api_secret: str) -> str:
     h = hmac.new(api_secret.encode('utf-8'),
                  query_string.encode('utf-8'), hashlib.sha256)
-    return h.hexddatigest()
+    return h.hexdigest()
 
 
 def create_query_string(data: Union[dict, list]) -> str:
