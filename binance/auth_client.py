@@ -2,6 +2,7 @@ from .public_client import PublicClient
 from .api_def import AuthenticatedAPI
 from requests import Session
 from .utils import create_query_string, create_sorted_list, generate_signature
+from .wallet import Wallet
 import time
 
 class AuthenticatedClient(PublicClient, AuthenticatedAPI):
@@ -20,13 +21,11 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         super(AuthenticatedClient, self).__init__(endpoint_version=endpoint_version,
                                                   request_params=request_params,
                                                   tld=tld)
+        self.wallet = Wallet()
         self._add_apikey_to_header()
 
     def _add_apikey_to_header(self):
         self.session.headers.update({'X-MBX-APIKEY': self.api_key})
-
-    def _create_withdraw_api_uri(self, path: str):
-        return self.WITHDRAW_API__URL + '/' + self.WITHDRAW_API_VERSION + '/' + path
 
     def __create_margin_api_uri(self, path: str):
         return self.MARGIN_API__URL + '/' + self.MARGIN_API_VERSION + '/' + path
