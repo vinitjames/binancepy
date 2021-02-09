@@ -1,28 +1,33 @@
 from .public_client import PublicClient
 from .api_def import AuthenticatedAPI
-from requests import Session
+#from requests import Session
+from .request_handler import RequestHandler
 from .utils import create_query_string, create_sorted_list, generate_signature
 from .wallet import Wallet
 import time
 
 class AuthenticatedClient(PublicClient, AuthenticatedAPI):
 
-    def __init__(self, api_key: str, api_secret: str,
-                 endpoint_version: str = '', request_params: dict = None, tld: str = 'com'):
+    def __init__(self,
+                 api_key: str,
+                 api_secret: str,
+                 endpoint_version: str = '',
+                 request_params: dict = None,
+                 tld: str = 'com'):
 
-        self.api_key = api_key
-        self.api_secret = api_secret
-
-        self.WITHDRAW_API_URL = self.WITHDRAW_API_URL.format(
-            endpoint_version, tld)
-        self.MARGIN_API_URL = self.MARGIN_API_URL.format(endpoint_version, tld)
-        self.WEBSITE_URL = self.WEBSITE_URL.format(endpoint_version, tld)
-        self.FUTURES_URL = self.FUTURES_URL.format(endpoint_version, tld)
         super(AuthenticatedClient, self).__init__(endpoint_version=endpoint_version,
                                                   request_params=request_params,
                                                   tld=tld)
-        self.wallet = Wallet()
-        self._add_apikey_to_header()
+      
+        self.WITHDRAW_API_URL = self.WITHDRAW_API_URL.format(endpoint_version, tld)
+        self.MARGIN_API_URL = self.MARGIN_API_URL.format(endpoint_version, tld)
+        self.WEBSITE_URL = self.WEBSITE_URL.format(endpoint_version, tld)
+        self.FUTURES_URL = self.FUTURES_URL.format(endpoint_version, tld)
+        self.request_handler = RequestHandler(api_key = api_key,
+                                              api_secret = api_secret,
+                                              request_params = request_params)
+        self.wallet = Wallet(self.request_handler)
+        #self._add_apikey_to_header()
 
     def _add_apikey_to_header(self):
         self.session.headers.update({'X-MBX-APIKEY': self.api_key})
@@ -32,7 +37,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
 
     def _create_futures_api_uri(self, path: str):
         return self.FUTURES_API__URL + '/' + self.FUTURES_API_VERSION + '/' + path
-
+    '''
     def _request_auth(self, method: str, uri: str,
                       signed: bool, forced_params=False, **params):
         kwargs = {}
@@ -62,7 +67,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
 
     def _delete(self, path, signed=False, **kwargs):
         return self._request_auth('delete', path, signed, version, **kwargs)
-
+    '''
     def create_order(self,
                      symbol: str,
                      side: str,
@@ -82,7 +87,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order',
                                    version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def limit_buy_order(self,
                         symbol: str,
@@ -114,9 +119,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = locals()
         del params['self']
         params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_STOP_LOSS_LIMIT \
-            if stopPrice != None else self.ORDER_TYPE_LIMIT
-        
+        params['type'] = self.ORDER_TYPE_LIMIT 
         return self.create_order(**params)
 
     def limit_maker_buy_order(self,
@@ -354,7 +357,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order/oco',
                                    version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def oco_buy_order(self,
                       symbol: str,
@@ -400,7 +403,6 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
                           symbol: str,
                           side: str,
                           type: str,
-                          timestamp: int,
                           timeInForce: str = None,
                           quantity: int = None,
                           quoteOrderQty: int = None,
@@ -416,11 +418,10 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order/test',
                                    version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def cancel_order(self,
                      symbol: str,
-                     timestamp: int,
                      orderId: int = None,
                      origClientOrderId: str = None,
                      newClientOrderId: str = None,
@@ -434,25 +435,23 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order',
                                    version=self.PRIVATE_API_VERSION)
-        return self._delete(uri, signed=True, **params)
+        return self.request_handler.delete(uri, signed=True, **params)
     
     def cancel_all_orders(self,
                           symbol: str,
-                          timestamp: int,
                           recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('openOrders',
                                    version=self.PRIVATE_API_VERSION)
-        return self._delete(uri, signed=True, **params)
+        return self.request_handler.delete(uri, signed=True, **params)
 
-    def query_order(self,
-                    symbol: str,
-                    timestamp: int,
-                    orderId: int = None,
-                    origClientOrderId: str = None,
-                    recvWindow: int = None) -> dict:
+    def get_order(self,
+                  symbol: str,
+                  orderId: int = None,
+                  origClientOrderId: str = None,
+                  recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
@@ -462,59 +461,58 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order',
                                    version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
-    def query_open_orders(self,
-                          timestamp: int,
-                          symbol: str = None,
-                          recvWindow: int = None) -> dict:
+    def get_open_orders(self,
+                        symbol: str = None,
+                        recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('openOrders',
                                    version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
-    def query_all_orders(self,
-                         symbol: str,
-                         orderId: str = None,
-                         startTime: int = None,
-                         endTime: int = None,
-                         limit: int = None,
-                         recvWindow: int = None) -> dict:
+    def get_all_orders(self,
+                       symbol: str,
+                       orderId: str = None,
+                       startTime: int = None,
+                       endTime: int = None,
+                       limit: int = None,
+                       recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('allOrders',
                                    version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
-    def query_account_info(self,
-                           recvWindow: int = None) -> dict:
+    def get_account_info(self,
+                         recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('account',
                                    version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
-    def query_trade_list(self,
-                         symbol: str,
-                         startTime: int = None,
-                         endTime: int = None,
-                         formId: int = None,
-                         limit: int = None,
-                         recvWindow: int = None) -> dict:
+    def get_trade_list(self,
+                       symbol: str,
+                       startTime: int = None,
+                       endTime: int = None,
+                       formId: int = None,
+                       limit: int = None,
+                       recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('myTrades',
                                    version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     
     # margin endpoints
@@ -529,7 +527,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         
         uri = self._create_margin_api_uri('margin/transfer',
                                           version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def transfer_spot_to_margin(self,
                                 asset: str,
@@ -541,7 +539,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/transfer',
                                           version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def margin_account_borrow(self,
                               asset: str,
@@ -559,7 +557,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/loan',
                                           version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def margin_account_repay(self,
                              asset: str,
@@ -577,7 +575,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/repay',
                                           version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def query_margin_asset(self,
                            asset: str):
@@ -586,7 +584,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/asset',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_cross_margin_pair(self,
                                 symbol: str):
@@ -595,17 +593,17 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/pair',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def get_all_margin_assets(self):
         uri = self._create_margin_api_uri('margin/allAssets',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True)
+        return self.request_handler.get(uri, signed=True)
 
     def get_all_cross_margin_pairs(self):
         uri = self._create_margin_api_uri('margin/allPairs',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True)
+        return self.request_handler.get(uri, signed=True)
 
     def query_cross_margin_price_index(self,
                                        symbol: str):
@@ -614,7 +612,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/priceIndex',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
 
     def create_margin_order(self,
@@ -639,7 +637,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/order',
                                           version=self.PRIVATE_API_VERSION)
-        return self._post(uri, signed=True, **params)
+        return self.request_handler.post(uri, signed=True, **params)
 
     def margin_limit_buy_order(self,
                                symbol: str,
@@ -871,7 +869,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/order',
                                           version=self.PRIVATE_API_VERSION)
-        return self._delete(uri, signed=True, **params)
+        return self.request_handler.delete(uri, signed=True, **params)
 
     def cancel_all_margin_order(self,
                                 symbol: str,
@@ -887,7 +885,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/openOrders',
                                           version=self.PRIVATE_API_VERSION)
-        return self._delete(uri, signed=True, **params)
+        return self.request_handler.delete(uri, signed=True, **params)
 
     
     def get_cross_margin_transfer_history(self,
@@ -904,7 +902,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/transfer',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_loan_record(self,
                                  asset: str,
@@ -921,7 +919,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/loan',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_repay_record(self,
                                   asset: str,
@@ -938,7 +936,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/repay',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def get_margin_interest_history(self,
                                     asset: str,
@@ -955,7 +953,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/interestHistory',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def get_margin_force_liquidation_record(self,
                                             isolatedSymbol: str = None,
@@ -970,7 +968,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/forceLiquidationRec',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_cross_margin_account_details(self,
                                             recvWindow: int = None):
@@ -979,7 +977,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_margin_api_uri('margin/account',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_account_order(self,
                                    symbol: str,
@@ -993,7 +991,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/order',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_account_open_orders(self,
                                          symbol: str = None,
@@ -1005,7 +1003,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/openOrders',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_account_order(self,
                                    symbol: str,
@@ -1021,7 +1019,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         uri = self._create_margin_api_uri('margin/allOrders',
                                           version=self.PRIVATE_API_VERSION)
-        return self._get(uri, signed=True, **params)
+        return self.request_handler.get(uri, signed=True, **params)
     
     
 if __name__ == '__main__':
