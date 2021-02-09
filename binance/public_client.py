@@ -1,28 +1,35 @@
 from .api_def import PublicAPI
 from .exceptions import BinanceAPIException, BinanceRequestException
 from .utils import format_time
-from requests import Session
-from requests.models import Response
+#from requests import Session
+#from requests.models import Response
+from .request_handler import RequestHandler
 from typing import Union
-
 
 
 class PublicClient(PublicAPI):
 
-    def __init__(self, endpoint_version: str = '', request_params: dict = None, tld: str = 'com'):
+    def __init__(self,
+                 endpoint_version: str = '',
+                 request_params: dict = None,
+                 tld: str = 'com'):
+        
         self.API_URL = self.API_URL.format(endpoint_version, tld)
-        self.session = self._init_session()
-        self.request_params = request_params
+        #self.session = self._init_session()
+        #self.request_params = request_params
+        self.request_handler = RequestHandler(request_params = request_params)
 
-    def _init_session(self) -> Session:
+    '''
+        def _init_session(self) -> Session:
         session = Session()
         session.headers.update({'Accept': 'application/json',
                                 'User-Agent': 'binance/python'})
         return session
+    '''
 
-    def _create_api_uri(self, path: str, version=PublicAPI.PUBLIC_API_VERSION):
+    def _create_api_uri(self, path: str, version=PublicAPI.PUBLIC_API_VERSION) -> str:
         return self.API_URL + '/' + version + '/' + path
-
+    '''
     def _request_public(self, uri, **params):
 
         kwargs = {}
@@ -32,7 +39,7 @@ class PublicClient(PublicAPI):
             kwargs.update(self.request_params)
         response = self.session.get(uri, **kwargs)
         return self._handle_response(response)
-
+ 
     @classmethod
     def _handle_response(cls, response: Response) -> dict:
         if(type(response) != Response):
@@ -45,18 +52,19 @@ class PublicClient(PublicAPI):
             return response.json()
         except ValueError:
             raise BinanceRequestException(response)
-
+    '''
+    
     def ping(self) -> dict:
         uri = self._create_api_uri('ping')
-        return self._request_public(uri)
+        return self.request_handler.get(uri)
 
     def get_server_time(self) -> dict:
         uri = self._create_api_uri('time')
-        return self._request_public(uri)
+        return self.request_handler.get(uri)
 
     def get_exchange_info(self) -> dict:
         uri = self._create_api_uri('exchangeInfo')
-        return self._request_public(uri)
+        return self.request_handler.get(uri)
 
     def get_symbol_info(self, symbol: str) -> dict:
         resp_data = self.get_exchange_info()
@@ -68,33 +76,33 @@ class PublicClient(PublicAPI):
     def get_price_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/price')
         if(symbol == None):
-            return self._request_public(uri)
-        return self._request_public(uri, symbol=symbol)
+            return self.request_handler.get(uri)
+        return self.request_handler.get(uri, symbol=symbol)
 
     def get_orderbook_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/bookTicker')
         if(symbol == None):
-            return self._request_public(uri)
-        return self._request_public(uri, symbol=symbol)
+            return self.request_handler.get(uri)
+        return self.request_handler.get(uri, symbol=symbol)
 
     def get_order_book(self, symbol: str, limit: int = 100):
         uri = self._create_api_uri('depth')
-        return self._request_public(uri, symbol=symbol, limit=limit)
+        return self.request_handler.get(uri, symbol=symbol, limit=limit)
 
     def get_avg_price(self, symbol: str) -> dict:
         #avg price does not work with v1
-        uri = self._create_api_uri('avgPrice', version='v3') 
-        return self._request_public(uri, symbol=symbol)
+        uri = self._create_api_uri('avgPrice', version='v3')
+        return self.request_handler.get(uri, symbol=symbol)
 
     def get_24hr_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/24hr')
         if(symbol == None):
-            return self._request_public(uri)
-        return self._request_public(uri, symbol=symbol)
-
+            return self.request_handler.get(uri)
+        return self.request_handler.get(uri, symbol=symbol)
+    
     def get_recent_trades(self, symbol: str, limit: int = 100) -> dict:
         uri = self._create_api_uri('trades')
-        return self._request_public(uri, symbol=symbol, limit=limit)
+        return self.request_handler.get(uri, symbol=symbol, limit=limit)
 
     def get_agg_trades(self, symbol: str,
                        formId: int = None,
@@ -105,7 +113,7 @@ class PublicClient(PublicAPI):
         del params['self']
         params = {k:v for k,v in params.items() if v is not None}
         uri = self._create_api_uri('aggTrades')
-        return self._request_public(uri, **params)
+        return self.request_handler.get(uri, **params)
 
     def get_klines(self, symbol: str,
                    interval: str,
@@ -121,7 +129,7 @@ class PublicClient(PublicAPI):
         del params['self']
         params = {k:v for k,v in params.items() if v is not None}
         uri = self._create_api_uri('klines')
-        return self._request_public(uri, **params)
+        return self.request_handler.get(uri, **params)
 
 
 if __name__ == '__main__':
