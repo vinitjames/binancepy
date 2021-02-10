@@ -38,3 +38,14 @@ def format_time(data: Union[int, float, str]) -> float:
         dt_obj = dt_obj.replace(tzinfo=pytz.utc)
     # return the difference in time
     return int((dt_obj - epoch).total_seconds() * 1000.0)
+
+def interval_to_ms(interval: str) -> int:
+    value = int(interval[:-1])
+    unit = interval[-1]
+    seconds_per_unit = {
+        'm': 60,
+        'h': 60*60,
+        'd': 60*60*24,
+        'w': 60*60*24*7
+    }
+    return value * seconds_per_unit[unit] * 1000
