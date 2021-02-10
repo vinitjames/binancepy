@@ -85,3 +85,19 @@ if __name__ == '__main__':
                                endTime = round(time.time()*1000),
                                limit=5)
     print("klines: ", klines)
+
+
+    ''' getting historical klines/candelstick for a symbol, 
+        interval: is enum(1m, 1h, 2h ....) see api_def for more info
+        startTime: time in milliseconds for the start time of the trades 
+        endTime: time in milliseconds for the end time  of trades
+        If startTime, and endTime are not sent, the most recent klines are returned.
+        Default limit value = 500
+    '''
+    
+    klines = client.get_historical_klines(symbol = 'ETHUSDT',
+                               interval = client.KLINE_INTERVAL_1DAY,
+                               startTime = '2/12/2018',
+                               endTime = '12/12/2019')
+
+    print("klines: ", klines)
