@@ -80,5 +80,4 @@ WEBSOCKET_DEPTH_10 = '10'
 WEBSOCKET_DEPTH_20 = '20'
 
 if __name__ == '__main__':
-    import ipdb
-    ipdb.set_trace()
+    pass
