@@ -1,11 +1,12 @@
+
 from .api_def import PublicAPI
 from .exceptions import BinanceAPIException, BinanceRequestException
-from .utils import format_time
+from .utils import format_time, interval_to_ms
 #from requests import Session
 #from requests.models import Response
 from .request_handler import RequestHandler
 from typing import Union
-
+import time
 
 class PublicClient(PublicAPI):
 
@@ -111,26 +112,75 @@ class PublicClient(PublicAPI):
                        limit: int = 500):
         params = locals()
         del params['self']
-        params = {k:v for k,v in params.items() if v is not None}
-        uri = self._create_api_uri('aggTrades')
-        return self.request_handler.get(uri, **params)
-
-    def get_klines(self, symbol: str,
-                   interval: str,
-                   startTime: Union[int, str] = None,
-                   endTime: Union[int, str] = None,
-                   limit: int = None):
-        
-        params = locals()
         if(params['startTime'] != None):
             params['startTime'] = format_time(params['startTime'])
         if(params['endTime'] != None):
             params['endTime'] = format_time(params['endTime'])
+        params = {k:v for k,v in params.items() if v is not None}
+        uri = self._create_api_uri('aggTrades')
+        return self.request_handler.get(uri, **params)
+
+    def get_klines(self,
+                   symbol: str,
+                   interval: str,
+                   startTime: Union[int, str] = None,
+                   endTime: Union[int, str] = None,
+                   limit: int = None) -> dict:
+        
+        params = locals()
         del params['self']
+        if(params['startTime'] != None):
+            params['startTime'] = format_time(params['startTime'])
+        if(params['endTime'] != None):
+            params['endTime'] = format_time(params['endTime'])
         params = {k:v for k,v in params.items() if v is not None}
         uri = self._create_api_uri('klines')
         return self.request_handler.get(uri, **params)
 
+    def _get_earliest_valid_timestamp(self, symbol:str, interval:str):
+                
+        kline = self.get_klines(
+            symbol=symbol,
+            interval=interval,
+            limit=1,
+            startTime=0,
+            endTime=None)
+        return kline[0][0]
+
+    def get_historical_klines(self,
+                              symbol: str,
+                              interval: str,
+                              startTime: Union[int, str],
+                              endTime: Union[int, str] = None) -> dict:
+        params = locals()
+        del params['self']
+        earliest_timestamp = self._get_earliest_valid_timestamp(symbol,
+                                                                interval)
+        
+        params['startTime'] = format_time(params['startTime'])
+        params['startTime'] = max(earliest_timestamp, params[
+            'startTime'])
+        if(params['endTime'] != None):
+            params['endTime'] = format_time(params['endTime'])
+        if(params['endTime'] != None) and(params['startTime'] > params['endTime']):
+            raise ValueError('startTime entered is greater than endTime')
+        params = {k:v for k,v in params.items() if v is not None}
+        params['limit'] = 500
+        data = []
+        api_call_count = 0
+        while(True):
+            fetched_data = self.get_klines(**params)
+            api_call_count+=1
+            data.extend(fetched_data)
+            if(len(fetched_data) < params['limit']):
+                break
+            params['startTime'] = fetched_data[-1][0] + interval_to_ms(interval)
+            if (api_call_count) == 3:
+                time.sleep(0.5)
+                api_call_count = 0
+        return data
+            
+            
 
 if __name__ == '__main__':
     pass
