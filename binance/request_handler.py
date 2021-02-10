@@ -2,6 +2,7 @@ from .exceptions import BinanceAPIException, BinanceRequestException
 from .utils import create_query_string, create_sorted_list, generate_signature
 from requests import Session
 from requests.models import Response 
+import time
 
 class RequestHandler(object):
     def __init__(self,
