@@ -1,6 +1,4 @@
-
 from requests.models import Response
-
 
 class BinanceAPIException(Exception):
     def __init__(self, response: Response):
@@ -27,3 +25,16 @@ class BinanceRequestException(Exception):
 
     def __str__(self):
         return 'BinanceRequestException: %s' % self.message
+
+class RequestHandlerError(Exception):
+    def __init__(self, message:str = None):
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return 'RequestHandlerError has been raised'
+        return 'RequestHandlerError, {}'.format(self.message)
+
+if __name__ == '__main__':
+    pass
+    

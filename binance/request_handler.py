@@ -1,4 +1,4 @@
-from .exceptions import BinanceAPIException, BinanceRequestException
+from .exceptions import BinanceAPIException, BinanceRequestException, RequestHandlerError
 from .utils import create_query_string, create_sorted_list, generate_signature
 from requests import Session
 from requests.models import Response 
@@ -47,29 +47,33 @@ class RequestHandler(object):
 
     def get(self, path, signed=False, **kwargs):
         if not self.authenticated and signed == True:
-            raise TypeError("can call post on unauthenticated error")
+            raise RequestHandlerError(
+                "Unauthenticated client issued a signed GET http request")
         return self._request('get', path, signed, **kwargs)
 
     def post(self, path, signed=False, **kwargs):
         if not self.authenticated:
-            raise TypeError("can call post on unauthenticated error")
+            raise RequestHandlerError(
+                "Unauthenticated client issued a POST http request")
         return self._request('post', path, signed, **kwargs)
 
     def put(self, path, signed=False, **kwargs):
         if not self.authenticated:
-            raise TypeError("can call put on unauthenticated error")
+            raise RequestHandlerError(
+                "Unauthenticated client issued a PUT http request")
         return self._request('put', path, signed, version, **kwargs)
 
     def delete(self, path, signed=False, **kwargs):
         if not self.authenticated:
-            raise TypeError("can call delete on unauthenticated error")
+            raise RequestHandler(
+                "Unauthenticated client issued a DELETE http request")
         return self._request('delete', path, signed, version, **kwargs)
 
     @classmethod
     def _handle_response(cls, response: Response) -> dict:
         if(type(response) != Response):
-            raise ValueError(
-                "Client Error: _handle resource was not called with Response Type")
+            raise RequestHandlerError(
+                " _handle_response called with an argument  which is not of type Response")
         if(not str(response.status_code).startswith('2')):
             raise BinanceAPIException(response)
 
