@@ -37,37 +37,7 @@ class AuthenticatedClient(PublicClient, AuthenticatedAPI):
 
     def _create_futures_api_uri(self, path: str):
         return self.FUTURES_API__URL + '/' + self.FUTURES_API_VERSION + '/' + path
-    '''
-    def _request_auth(self, method: str, uri: str,
-                      signed: bool, forced_params=False, **params):
-        kwargs = {}
-        kwargs['timeout'] = 10
-        if self.request_params:
-            kwargs.update(self.response_params)
-
-        if signed:
-            params = create_sorted_list(params)
-            params.append(('timestamp', int(time.time() * 1000)))
-            query_string = create_query_string(params)
-            params.append(('signature' , generate_signature(query_string=query_string,
-                                                            api_secret=self.api_secret)))
-        
-        kwargs['params'] = params
-        response = getattr(self.session, method)(uri, **kwargs)
-        return self._handle_response(response)
-
-    def _get(self, path, signed=False, **kwargs):
-        return self._request_auth('get', path, signed, **kwargs)
-
-    def _post(self, path, signed=False, **kwargs):
-        return self._request_auth('post', path, signed, **kwargs)
-
-    def _put(self, path, signed=False, **kwargs):
-        return self._request_auth('put', path, signed, version, **kwargs)
-
-    def _delete(self, path, signed=False, **kwargs):
-        return self._request_auth('delete', path, signed, version, **kwargs)
-    '''
+    
     def create_order(self,
                      symbol: str,
                      side: str,
