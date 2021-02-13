@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
         name='binancepy',
         version='0.0.1',
-        packages=['binance'],
+        packages= ['binance', 'binance.endpoints'],
         description='Binance REST API python implementation',
         url='https://github.com/vinitjames/binancepy',
         author='Vinit James',
