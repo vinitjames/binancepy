@@ -9,11 +9,15 @@ class MarketDataEndpoints(metaclass = ABCMeta):
     def request_handler(self):
         pass
 
+    @property
+    @abstractmethod
+    def KLINE_INTERVAL(self):
+        pass
+    
     @abstractmethod
     def _create_api_uri(self, path: str, version:str) -> str:
         pass
         
-
     def ping(self) -> dict:
         uri = self._create_api_uri('ping')
         return self.request_handler.get(uri)
