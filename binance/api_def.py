@@ -11,11 +11,14 @@ class ApiVersion(object):
     FUTURES  = 'v1'
 
 class ApiUrl(object):
-    DEFAULT  = BASE_URL + '/api'
-    WITHDRAW = BASE_URL + '/wapi'
-    MARGIN   = BASE_URL + '/sapi'
-    WEBSITE  = 'https://www.binance.{}'
-    FUTURES  = BASE_URL + '/sapi'
+    def __init__(self, endpoint_version = '', tld = 'com'):
+        self._tld = tld
+        self._base_url = BASE_URL.format(endpoint_version, tld)
+    self.DEFAULT  = self._base_url + '/api'
+    self.WITHDRAW = self._base_url + '/wapi'
+    self.MARGIN   = self._base_url + '/sapi'
+    self.WEBSITE  = 'https://www.binance.{}'.format(self._tld)
+    self.FUTURES  = self._base_url + '/sapi'
      
 class KlineInterval(object):
     ONEMINUTE     = '1m'
