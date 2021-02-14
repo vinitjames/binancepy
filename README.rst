@@ -17,9 +17,6 @@ https://python-binance.readthedocs.io/en/latest/
 Binance API Telegram
 https://t.me/binance_api_english
 
-Blog with examples
-https://sammchardy.github.io
-
 Make sure you update often and check the `Changelog <https://python-binance.readthedocs.io/en/latest/changelog.html>`_ for new features and bug fixes.
 
 Features
