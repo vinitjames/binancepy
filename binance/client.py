@@ -89,7 +89,7 @@ class AuthenticatedClient(MarketDataEndpoints,
         return self.API_URL.DEFAULT + '/' + version + '/' + path
 
     def __create_margin_api_uri(self, path: str):
-        return self.API_URL.MARGIN + '/' + self.MARGIN_API_VERSION + '/' + path
+        return self.API_URL.MARGIN + '/' + self.API_VERSION.MARGIN + '/' + path
 
     def _create_futures_api_uri(self, path: str):
         return self.API_URL.FUTURES + '/' + self.FUTURES_API_VERSION + '/' + path

@@ -44,6 +44,16 @@ class SpotTradingError(Exception):
             return 'SpotTradingError has been raised'
         return 'SpotTradingError, {}'.format(self.message)
 
+class MargingTradingError(Exception):
+    def __init__(self, message:str = None):
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return 'MarginTradingError has been raised'
+        return 'MarginTradingError, {}'.format(self.message)
+    
+
 if __name__ == '__main__':
     pass
     

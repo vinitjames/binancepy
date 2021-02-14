@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import Union
+from binance.exceptions import MarginTradingError
 from binance.utils import format_time, interval_to_ms
 
 class MarginAccountEndpoints(metaclass = ABCMeta):
@@ -24,34 +25,40 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
         pass
     
     @abstractmethod
-    def _create_api_uri(self, path: str, version:str) -> str:
+    def _create_margin_api_uri(self, path: str) -> str:
         pass
 
-
-    def transfer_margin_to_spot(self,
+    def cross_margin_transfer(self,
+                              asset: str,
+                              amount: float,
+                              type: int,
+                              recvWindow: int = None) -> dict:
+        params = locals()
+        del params['self']
+        if(params['type'] not in [1,2]):
+            raise MarginTradingError(
+                "Cross Margin transfer called with a type not in [1,2]")
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_margin_api_uri('margin/transfer')
+        return self.request_handler.post(uri, signed=True, **params)
+        
+    def margin_to_spot_transfer(self,
                                 asset: str,
                                 amount: float,
                                 recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
         params['type'] = 2
-        params = {k: v for k, v in params.items() if v is not None}
-            
-        uri = self._create_margin_api_uri('margin/transfer',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.post(uri, signed=True, **params)
+        return self.cross_margin_transfer(**params)
 
-    def transfer_spot_to_margin(self,
+    def spot_to_margin_transfer(self,
                                 asset: str,
                                 amount: float,
                                 recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
         params['type'] = 1
-        params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/transfer',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.post(uri, signed=True, **params)
+        return self.cross_margin_transfer(**params)
 
     def margin_account_borrow(self,
                               asset: str,
@@ -64,11 +71,12 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
             raise ValueError("isIsolated is true but symbol not specified")
         params = locals()
         del params['self']
-        params['type'] = 1
+        if(params['isIsolated']) and (params['symbol'] is None):
+            raise MarginTradingError(
+                "symbol parameter not passed for Isolated margin borrow request")
         params = {k: v for k, v in params.items() if v is not None}
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
-        uri = self._create_margin_api_uri('margin/loan',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/loan')
         return self.request_handler.post(uri, signed=True, **params)
 
     def margin_account_repay(self,
@@ -82,50 +90,39 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
             raise ValueError("isIsolated is true but symbol not specified")
         params = locals()
         del params['self']
-        params['type'] = 1
+        if(params['isIsolated']) and (params['symbol'] is None):
+            raise MarginTradingError(
+                "symbol parameter not passed for Isolated margin repay request")
         params = {k: v for k, v in params.items() if v is not None}
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
-        uri = self._create_margin_api_uri('margin/repay',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/repay')
         return self.request_handler.post(uri, signed=True, **params)
 
     def query_margin_asset(self,
                            asset: str):
-        params = locals()
-        del params['self']
-        params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/asset',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.get(uri, signed=True, **params)
+        params['asset'] = asset 
+        uri = self._create_margin_api_uri('margin/asset')
+        return self.request_handler.get(uri, signed=False, **params)
 
     def query_cross_margin_pair(self,
                                 symbol: str):
-        params = locals()
-        del params['self']
-        params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/pair',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.get(uri, signed=True, **params)
+        params['symbol'] = symbol 
+        uri = self._create_margin_api_uri('margin/pair')
+        return self.request_handler.get(uri, signed=False, **params)
 
     def get_all_margin_assets(self):
-        uri = self._create_margin_api_uri('margin/allAssets',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.get(uri, signed=True)
+        uri = self._create_margin_api_uri('margin/allAssets')
+        return self.request_handler.get(uri, signed=False)
 
     def get_all_cross_margin_pairs(self):
-        uri = self._create_margin_api_uri('margin/allPairs',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.get(uri, signed=True)
+        uri = self._create_margin_api_uri('margin/allPairs')
+        return self.request_handler.get(uri, signed=False)
 
     def query_cross_margin_price_index(self,
                                        symbol: str):
-        params = locals()
-        del params['self']
-        params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/priceIndex',
-                                          version=self.PRIVATE_API_VERSION)
-        return self.request_handler.get(uri, signed=True, **params)
-
+        params['symbol'] = symbol
+        uri = self._create_margin_api_uri('margin/priceIndex')
+        return self.request_handler.get(uri, signed=False, **params)
 
     def create_margin_order(self,
                             symbol: str,
@@ -147,8 +144,7 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
-        uri = self._create_margin_api_uri('margin/order',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/order')
         return self.request_handler.post(uri, signed=True, **params)
 
     def margin_limit_buy_order(self,
@@ -165,8 +161,8 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_LIMIT
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.LIMIT
         return self.create_margin_order(**params)
 
     def margin_limit_sell_order(self,
@@ -183,8 +179,8 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                 recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_LIMIT
+        params['side'] = self.ORDER_SIDE.SELL
+        params['type'] = self.ORDER_TYPE.LIMIT
         return self.create_margin_order(**params)
 
     def margin_market_buy_order(self,
@@ -199,8 +195,8 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                 recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_MARKET
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.MARKET
         return self.create_margin_order(**params)
 
     def margin_market_sell_order(self,
@@ -215,11 +211,30 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                  recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_MARKET
+        params['side'] = self.ORDER_SIDE.SELL
+        params['type'] = self.ORDER_TYPE.MARKET
         return self.create_margin_order(**params)
     
-    def margin_limit_stop_loss_buy_order(self,
+    def margin_limit_stoploss_buy_order(self,
+                                        symbol: str,
+                                        stopPrice: float,
+                                        isIsolated: bool = False,
+                                        timeInForce: str = None,
+                                        quantity: float = None,
+                                        quoteOrderQty: float = None,
+                                        price: float = None,
+                                        newClientOrderId: str = None,
+                                        icebergQty: float = None,
+                                        newOrderRespType: str = None,
+                                        sideEffectType: str = None,
+                                        recvWindow: int = None) -> dict:
+        params = locals()
+        del params['self']
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.STOP_LOSS_LIMIT
+        return self.create_margin_order(**params)
+
+    def margin_limit_stoploss_sell_order(self,
                                          symbol: str,
                                          stopPrice: float,
                                          isIsolated: bool = False,
@@ -234,30 +249,29 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                          recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_STOP_LOSS_LIMIT
+        params['side'] = self.ORDER_SIDE.SELL
+        params['type'] = self.ORDER_TYPE.STOP_LOSS_LIMIT
         return self.create_margin_order(**params)
 
-    def margin_limit_stop_loss_sell_order(self,
-                                          symbol: str,
-                                          stopPrice: float,
-                                          isIsolated: bool = False,
-                                          timeInForce: str = None,
-                                          quantity: float = None,
-                                          quoteOrderQty: float = None,
-                                          price: float = None,
-                                          newClientOrderId: str = None,
-                                          icebergQty: float = None,
-                                          newOrderRespType: str = None,
-                                          sideEffectType: str = None,
-                                          recvWindow: int = None) -> dict:
+    def margin_stoploss_buy_order(self,
+                                  symbol: str,
+                                  stopPrice: float,
+                                  isIsolated: bool = False,
+                                  timeInForce: str = None,
+                                  quantity: float = None,
+                                  quoteOrderQty: float = None,
+                                  price: float = None,
+                                  newClientOrderId: str = None,
+                                  newOrderRespType: str = None,
+                                  sideEffectType: str = None,
+                                  recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_STOP_LOSS_LIMIT
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.STOP_LOSS
         return self.create_margin_order(**params)
 
-    def margin_stop_loss_buy_order(self,
+    def margin_stoploss_sell_order(self,
                                    symbol: str,
                                    stopPrice: float,
                                    isIsolated: bool = False,
@@ -271,11 +285,11 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                    recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_STOP_LOSS
+        params['side'] = self.ORDER_SIDE.SELL
+        params['type'] = self.ORDER_TYPE.STOP_LOSS
         return self.create_margin_order(**params)
 
-    def margin_stop_loss_sell_order(self,
+    def margin_takeprofit_buy_order(self,
                                     symbol: str,
                                     stopPrice: float,
                                     isIsolated: bool = False,
@@ -289,11 +303,11 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                     recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_STOP_LOSS
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.TAKE_PROFIT
         return self.create_margin_order(**params)
 
-    def margin_take_profit_buy_order(self,
+    def margin_takeprofit_sell_order(self,
                                      symbol: str,
                                      stopPrice: float,
                                      isIsolated: bool = False,
@@ -307,64 +321,46 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
                                      recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_TAKE_PROFIT
-        return self.create_margin_order(**params)
-
-    def margin_take_profit_sell_order(self,
-                                     symbol: str,
-                                      stopPrice: float,
-                                      isIsolated: bool = False,
-                                      timeInForce: str = None,
-                                      quantity: float = None,
-                                      quoteOrderQty: float = None,
-                                      price: float = None,
-                                      newClientOrderId: str = None,
-                                      newOrderRespType: str = None,
-                                      sideEffectType: str = None,
-                                      recvWindow: int = None) -> dict:
-        params = locals()
-        del params['self']
-        params['side'] = self.ORDER_SIDE_SELL
-        params['type'] = self.ORDER_TYPE_TAKE_PROFIT
+        params['side'] = self.ORDER_SIDE.SELL
+        params['type'] = self.ORDER_TYPE.TAKE_PROFIT
         return self.create_margin_order(**params)
     
-    def margin_take_profit_limit_buy_order(self,
-                                           symbol: str,
-                                           stopPrice: float,
-                                           isIsolated: bool = False,
-                                           timeInForce: str = None,
-                                           quantity: float = None,
-                                           quoteOrderQty: float = None,
-                                           price: float = None,
-                                           icebergQty: float = None,
-                                           newClientOrderId: str = None,
-                                           newOrderRespType: str = None,
-                                           sideEffectType: str = None,
-                                           recvWindow: int = None) -> dict:
+    def margin_takeprofit_limit_buy_order(self,
+                                          symbol: str,
+                                          stopPrice: float,
+                                          isIsolated: bool = False,
+                                          timeInForce: str = None,
+                                          quantity: float = None,
+                                          quoteOrderQty: float = None,
+                                          price: float = None,
+                                          icebergQty: float = None,
+                                          newClientOrderId: str = None,
+                                          newOrderRespType: str = None,
+                                          sideEffectType: str = None,
+                                          recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_TAKE_PROFIT_LIMIT
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.TAKE_PROFIT_LIMIT
         return self.create_margin_order(**params)
 
-    def margin_take_profit_limit_buy_order(self,
-                                           symbol: str,
-                                           stopPrice: float,
-                                           isIsolated: bool = False,
-                                           timeInForce: str = None,
-                                           quantity: float = None,
-                                           quoteOrderQty: float = None,
-                                           price: float = None,
-                                           icebergQty: float = None,
-                                           newClientOrderId: str = None,
-                                           newOrderRespType: str = None,
-                                           sideEffectType: str = None,
-                                           recvWindow: int = None) -> dict:
+    def margin_takeprofit_limit_buy_order(self,
+                                          symbol: str,
+                                          stopPrice: float,
+                                          isIsolated: bool = False,
+                                          timeInForce: str = None,
+                                          quantity: float = None,
+                                          quoteOrderQty: float = None,
+                                          price: float = None,
+                                          icebergQty: float = None,
+                                          newClientOrderId: str = None,
+                                          newOrderRespType: str = None,
+                                          sideEffectType: str = None,
+                                          recvWindow: int = None) -> dict:
         params = locals()
         del params['self']
-        params['side'] = self.ORDER_SIDE_BUY
-        params['type'] = self.ORDER_TYPE_TAKE_PROFIT_LIMIT
+        params['side'] = self.ORDER_SIDE.BUY
+        params['type'] = self.ORDER_TYPE.TAKE_PROFIT_LIMIT
         return self.create_margin_order(**params)
         
     def cancel_margin_order(self,
@@ -379,8 +375,7 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
         del params['self']
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/order',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/order')
         return self.request_handler.delete(uri, signed=True, **params)
 
     def cancel_all_margin_order(self,
@@ -395,8 +390,7 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
         del params['self']
         params['isIsolated'] = 'TRUE' if (params['isIsolated'] == True) else 'FALSE'
         params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/openOrders',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/openOrders')
         return self.request_handler.delete(uri, signed=True, **params)
 
     
@@ -412,8 +406,7 @@ class MarginAccountEndpoints(metaclass = ABCMeta):
         params = locals()
         del params['self']
         params = {k: v for k, v in params.items() if v is not None}
-        uri = self._create_margin_api_uri('margin/transfer',
-                                          version=self.PRIVATE_API_VERSION)
+        uri = self._create_margin_api_uri('margin/transfer')
         return self.request_handler.get(uri, signed=True, **params)
 
     def query_margin_loan_record(self,

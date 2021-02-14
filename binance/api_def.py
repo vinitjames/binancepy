@@ -14,6 +14,7 @@ class ApiUrl(object):
     def __init__(self, endpoint_version = '', tld = 'com'):
         self._tld = tld
         self._base_url = BASE_URL.format(endpoint_version, tld)
+        
     self.DEFAULT  = self._base_url + '/api'
     self.WITHDRAW = self._base_url + '/wapi'
     self.MARGIN   = self._base_url + '/sapi'
