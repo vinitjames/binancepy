@@ -35,6 +35,15 @@ class RequestHandlerError(Exception):
             return 'RequestHandlerError has been raised'
         return 'RequestHandlerError, {}'.format(self.message)
 
+class SpotTradingError(Exception):
+    def __init__(self, message:str = None):
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return 'SpotTradingError has been raised'
+        return 'SpotTradingError, {}'.format(self.message)
+
 if __name__ == '__main__':
     pass
     
