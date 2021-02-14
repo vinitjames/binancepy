@@ -2,12 +2,10 @@
 BinancePy  
 ================================
 
-This is an unofficial Python wrapper for the `Binance exchange REST API v3 <https://github.com/binance/binance-spot-api-docs>`_. I am in no way affiliated with Binance, use at your own risk.
+This is an unofficial Python wrapper for the `Binance exchange REST API v3 <https://github.com/binance/binance-spot-api-docs>`_.
 
-Note
-----
 
-																											
+
 Source code
 https://github.com/vinitjames/binancepy
 
@@ -42,12 +40,13 @@ Quick Start
 
 `Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
 
-.. code:: bash
+
+ .. code:: bash
 
 pip install binancepy
 
 
-.. code:: python
+ .. code:: python
 
 from binance.client import Client
 client = Client(api_key, api_secret)
