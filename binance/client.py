@@ -16,7 +16,7 @@ class PublicClient(MarketDataEndpoints):
                  request_params: dict = None,
                  tld: str = 'com'):
         
-        self.API_URL = ApiUrl.DEFAULT.format(endpoint_version, tld)
+        self.API_URL = ApiUrl(endpoint_version, tld)
         self._request_handler = RequestHandler(request_params = request_params)
         self._kline_interval = KlineInterval
 
@@ -44,16 +44,16 @@ class AuthenticatedClient(MarketDataEndpoints,
                  request_params: dict = None,
                  tld: str = 'com'):
 
-
-        self.WITHDRAW_API_URL = self.WITHDRAW_API_URL.format(endpoint_version, tld)
-        self.MARGIN_API_URL = self.MARGIN_API_URL.format(endpoint_version, tld)
-        self.WEBSITE_URL = self.WEBSITE_URL.format(endpoint_version, tld)
-        self.FUTURES_URL = self.FUTURES_URL.format(endpoint_version, tld)
+        self.API_URL = ApiUrl(endpoint_version, tld)
+        self._api_version = ApiVersion
         self._request_handler = RequestHandler(api_key = api_key,
                                                api_secret = api_secret,
                                                request_params = request_params)
-        self._order_type = OrderType
+        self._order_response_type = OrderResponseType
         self._order_side = OrderSide
+        self._order_status = OrderStatus
+        self._order_type = OrderType
+        self._time_in_force = TimeInForce
         self.wallet = Wallet(self.request_handler)
         #self._add_apikey_to_header()
 
@@ -64,19 +64,35 @@ class AuthenticatedClient(MarketDataEndpoints,
     @property
     def ORDER_SIDE(self):
         return self._order_side
+
+    @property
+    def API_VERSION(self):
+        return self._api_version
+
+    @property
+    def ORDER_STATUS(self):
+        return self._order_status
+    
+    @property
+    def TIME_IN_FORCE(self):
+        return self._time_in_force
+
+    @property
+    def ORDER_RESPONSE_TYPE(self):
+        return self._order_response_type
     
     @property
     def request_handler(self):
         return self._request_handler
-    
+
     def _create_api_uri(self, path: str, version=ApiVersion.PUBLIC) -> str:
-        return self.API_URL + '/' + version + '/' + path
+        return self.API_URL.DEFAULT + '/' + version + '/' + path
 
     def __create_margin_api_uri(self, path: str):
-        return self.MARGIN_API__URL + '/' + self.MARGIN_API_VERSION + '/' + path
+        return self.API_URL.MARGIN + '/' + self.MARGIN_API_VERSION + '/' + path
 
     def _create_futures_api_uri(self, path: str):
-        return self.FUTURES_API__URL + '/' + self.FUTURES_API_VERSION + '/' + path
+        return self.API_URL.FUTURES + '/' + self.FUTURES_API_VERSION + '/' + path
     
     
 if __name__ == '__main__':

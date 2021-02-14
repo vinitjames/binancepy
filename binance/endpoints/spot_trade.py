@@ -24,6 +24,21 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
     @abstractmethod
     def ORDER_TYPE(self):
         pass
+
+    @property
+    @abstractmethod
+    def ORDER_STATUS(self):
+        pass
+    
+    @property
+    @abstractmethod
+    def TIME_IN_FORCE(self):
+        pass
+
+    @property
+    @abstractmethod
+    def ORDER_RESPONSE_TYPE(self):
+        pass
     
     @abstractmethod
     def _create_api_uri(self, path: str, version:str) -> str:
@@ -416,9 +431,9 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
 
         params = locals()
         del params['self']
-        if(params['orderId'] == None) and (params['origClientOrderId'] == None):
-            raise ValueError('Atleast on of orderId or origClientOrderId not passed',
-                             'for querying  order')
+        if(params['orderId'] is None) and (params['origClientOrderId'] is None):
+            raise SpotTradingError('Atleast on of orderId or origClientOrderId not passed',
+                                   'for querying  order')
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('order',
                                    version=self.API_VERSION.PRIVATE)
@@ -437,19 +452,71 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
 
     def get_all_orders(self,
                        symbol: str,
-                       orderId: str = None,
-                       startTime: int = None,
-                       endTime: int = None,
+                       orderId: int = None,
+                       startTime: Union[int, str] = None,
+                       endTime: Union[int, str] = None,
                        limit: int = None,
                        recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
+        if params['startTime'] is not None:
+            params['startTime'] = format_time(params['startTime'])
+        if params['endTime'] is not None:
+            params['endTime'] = format_time(params['endTime'])
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('allOrders',
                                    version=self.API_VERSION.PRIVATE)
         return self.request_handler.get(uri, signed=True, **params)
 
+    def get_oco_order(self,
+                      symbol: str,
+                      orderListId: int = None,
+                      origClientOrderId: str = None,
+                      recvWindow: int = None) -> dict:
+
+        params = locals()
+        del params['self']
+        if(params['orderListId'] is None) and (params['origClientOrderId'] is None):
+            raise SpotTradingError('Atleast on of orderListId or origClientOrderId not passed',
+                                   'for querying  oco order')
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_api_uri('orderList',
+                                   version=self.API_VERSION.PRIVATE)
+        return self.request_handler.get(uri, signed=True, **params)
+
+    def get_open_oco_orders(self,
+                            recvWindow: int = None) -> dict:
+
+        params = locals()
+        del params['self']
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_api_uri('openOrderList',
+                                   version=self.API_VERSION.PRIVATE)
+        return self.request_handler.get(uri, signed=True, **params)
+    
+    def get_all_oco_orders(self,
+                           formId: int = None,
+                           startTime: Union[int, str] = None,
+                           endTime: Union[int, str] = None,
+                           limit: int = None,
+                           recvWindow: int = None) -> dict:
+
+        params = locals()
+        del params['self']
+        if(param['formId'] is not None)and(
+                (param['startTime'] is not None) or
+                (param['endTime'] is not None)):
+            raise SpotTradingError("All OCO orders called with both formId and startTime/endTime ")
+        if params['startTime'] is not None:
+            params['startTime'] = format_time(params['startTime'])
+        if params['endTime'] is not None:
+            params['endTime'] = format_time(params['endTime'])
+        params = {k: v for k, v in params.items() if v is not None}
+        uri = self._create_api_uri('allOrderList',
+                                   version=self.API_VERSION.PRIVATE)
+        return self.request_handler.get(uri, signed=True, **params)
+    
     def get_account_info(self,
                          recvWindow: int = None) -> dict:
 
@@ -462,14 +529,18 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
 
     def get_trade_list(self,
                        symbol: str,
-                       startTime: int = None,
-                       endTime: int = None,
-                       formId: int = None,
+                       startTime: Union[int, str] = None,
+                       endTime: Union[int, str] = None,
+                       formId: int  = None,
                        limit: int = None,
                        recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
+        if params['startTime'] is not None:
+            params['startTime'] = format_time(params['startTime'])
+        if params['endTime'] is not None:
+            params['endTime'] = format_time(params['endTime'])
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('myTrades',
                                    version=self.API_VERSION.PRIVATE)
