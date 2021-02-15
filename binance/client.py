@@ -44,6 +44,7 @@ class AuthenticatedClient(MarketDataEndpoints,
 
         self.API_URL = ApiUrl(endpoint_version, tld)
         self._api_version = ApiVersion
+        self._kline_interval = KlineInterval
         self._request_handler = RequestHandler(api_key = api_key,
                                                api_secret = api_secret,
                                                request_params = request_params)
@@ -53,6 +54,10 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._order_type = OrderType
         self._time_in_force = TimeInForce
         #self._add_apikey_to_header()
+
+    @property
+    def KLINE_INTERVAL(self):
+        return self._kline_interval
 
     @property
     def ORDER_TYPE(self):
