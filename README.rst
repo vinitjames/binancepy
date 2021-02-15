@@ -2,7 +2,8 @@
 BinancePy  
 ================================
 
-[![MIT license](https://img.shields.io/github/license/vinitjames/binancepy)](https://opensource.org/licenses/MIT)
+..image:: https://img.shields.io/github/license/vinitjames/binancepy
+   :target: https://opensource.org/licenses/MIT)
 
 
 
