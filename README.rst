@@ -1,11 +1,10 @@
 ================================
 BinancePy  
 ================================
+.. image:: https://img.shields.io/github/license/vinitjames/binancepy
+    :target:  https://github.com/vinitjames/binancepy/blob/master/LICENSE
 
-[![MIT license](https://img.shields.io/github/license/vinitjames/binancepy)](https://opensource.org/licenses/MIT)
-
-
-
+|
 This is an unofficial Python wrapper for the `Binance exchange REST API v3 <https://github.com/binance/binance-spot-api-docs>`_.
 
 
