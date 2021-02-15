@@ -1,6 +1,5 @@
 import sys
-sys.path.insert(0, '../')
-from binance.public_client import PublicClient
+from binance.client import PublicClient
 
 if __name__ == '__main__':
     # creating a public client with default request params
@@ -80,7 +79,7 @@ if __name__ == '__main__':
         Default limit value = 500
     '''
     klines = client.get_klines(symbol = 'ETHEUR',
-                               interval = client.KLINE_INTERVAL_1HOUR,
+                               interval = client.KLINE_INTERVAL.ONEDAY,
                                startTime = round(time.time()*1000) - 100000000,
                                endTime = round(time.time()*1000),
                                limit=5)
@@ -96,7 +95,7 @@ if __name__ == '__main__':
     '''
     
     klines = client.get_historical_klines(symbol = 'ETHUSDT',
-                               interval = client.KLINE_INTERVAL_1DAY,
+                               interval = client.KLINE_INTERVAL.ONEDAY,
                                startTime = '2/12/2018',
                                endTime = '12/12/2019')
 

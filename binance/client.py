@@ -2,7 +2,6 @@ from .api_def import *
 from .exceptions import BinanceAPIException, BinanceRequestException
 from .request_handler import RequestHandler
 from .utils import create_query_string, create_sorted_list, generate_signature
-from .wallet import Wallet
 from binance.endpoints.market_data import MarketDataEndpoints
 from binance.endpoints.spot_trade import SpotAccountTradeEndpoints
 from binance.endpoints.margin_trade import MarginAccountEndpoints
@@ -29,12 +28,11 @@ class PublicClient(MarketDataEndpoints):
         return self._request_handler
     
     def _create_api_uri(self, path: str, version=ApiVersion.PUBLIC) -> str:
-        return self.API_URL + '/' + version + '/' + path
+        return self.API_URL.DEFAULT + '/' + version + '/' + path
 
  
 class AuthenticatedClient(MarketDataEndpoints,
-                          SpotAccountTradeEndpoints,
-                          MarginAccountEndpoints
+                          SpotAccountTradeEndpoints
                           ):
 
     def __init__(self,
@@ -54,7 +52,6 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._order_status = OrderStatus
         self._order_type = OrderType
         self._time_in_force = TimeInForce
-        self.wallet = Wallet(self.request_handler)
         #self._add_apikey_to_header()
 
     @property
