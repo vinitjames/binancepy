@@ -9,6 +9,8 @@ class ApiVersion(object):
     WITHDRAW = 'v3'
     MARGIN   = 'v1'
     FUTURES  = 'v1'
+    WALLET1  = 'v1'
+    WALLET2  = 'v3'
 
 class ApiUrl(object):
     def __init__(self, endpoint_version = '', tld = 'com'):

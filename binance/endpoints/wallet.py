@@ -1,56 +1,74 @@
+from abc import ABCMeta, abstractmethod
+from typing import Union
+from binance.utils import format_time, interval_to_ms
+from binance.exceptions import WalletError
 
-class Wallet(object):
+class Wallet(metaclass = ABCMeta):
 
-    def __init__(self,
-                 request_handler,
-
-                 ):
+    @property
+    @abstractmethod
+    def request_handler(self):
         pass
 
-    def _create_withdraw_api_uri(self, path: str):
-        return self.WITHDRAW_API__URL + '/' + self.WITHDRAW_API_VERSION + '/' + path
+    @property
+    @abstractmethod
+    def API_VERSION(self):
+        pass
+
+    @abstractmethod 
+    def _create_wallet_v1_api_uri(self, path: str):
+        pass
+
+    @abstractmethod 
+    def _create_wallet_v3_api_uri(self, path: str):
+        pass
 
     def get_system_starus(self) -> dict:
-        uri = self._create_withdraw_api_uri('systemStatus.html')
+        uri = self._create_wallet_v3_api_uri('systemStatus.html')
         return self.request_handler.get(uri, **params)
         
     def get_all_coin_info(self,
                           recvWindow: int = None)  -> dict:
-
-        params = locals()
-        del params['self']
-        uri = self._create_withdraw_api_uri('capital/config/getall')
-        return self.request_handler.get(uri, **params)    
+        params = {}
+        if recWindow is not None:
+            params['recvWindow'] = recWindow
+        uri = self._create_wallet_v1_api_uri('capital/config/getall')
+        return self.request_handler.get(uri, signed=True, **params)    
 
     def get_daily_account_snapshot(self,
                                    type:str,
-                                   startTime: int = None,
-                                   endTime: int = None,
+                                   startTime: Union[int, str] = None,
+                                   endTime: Union[int, str] = None,
                                    limit: int = 5,
                                    recvWindow: int = None) -> dict:
 
         params = locals()
         del params['self']
+        if(params['startTime'] is not None):
+            params['startTime'] = format_time(params['startTime'])
+        if(params['endTime'] is not None):
+            params['endTime'] = format_time(params['endTime'])
         params = {k : v for k, v in params.items() if v is not None}
-        uri = self._create_withdraw_api_uri('accountSnapshot')
+        uri = self._create_wallet_v1_api_uri('accountSnapshot')
         return self.request_handler.get(uri, signed=True, **params)
 
     def disable_fast_withdraw_switch(self,
                                      recvWindow: int = None) -> dict:
 
-        params = locals()
-        del params['self']
-        params = {k : v for k, v in params.items() if v is not None}
-        uri = self._create_withdraw_api_uri('account/disableFastWithdrawSwitch')
+        params = {}
+        if recWindow is not None:
+            params['recvWindow'] = recWindow
+        uri = self._create_wallet_v1_api_uri('account/disableFastWithdrawSwitch')
         return self.request_handler.post(uri, signed=True, **params)
 
     def enable_fast_withdraw_switch(self,
                                     recvWindow: int = None) -> dict:
 
-        params = locals()
-        del params['self']
+        params = {}
+        if recWindow is not None:
+            params['recvWindow'] = recWindow
         params = {k : v for k, v in params.items() if v is not None}
-        uri = self._create_withdraw_api_uri('account/enableFastWithdrawSwitch')
+        uri = self._create_wallet_v1_api_uri('account/enableFastWithdrawSwitch')
         return self.request_handler.post(uri, signed=True, **params)
 
     def widthdraw(self,
