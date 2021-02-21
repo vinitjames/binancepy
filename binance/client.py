@@ -32,7 +32,8 @@ class PublicClient(MarketDataEndpoints):
 
  
 class AuthenticatedClient(MarketDataEndpoints,
-                          SpotAccountTradeEndpoints
+                          SpotAccountTradeEndpoints,
+                          WalletEndpoints
                           ):
 
     def __init__(self,
@@ -44,6 +45,7 @@ class AuthenticatedClient(MarketDataEndpoints,
 
         self.API_URL = ApiUrl(endpoint_version, tld)
         self._api_version = ApiVersion
+        self._deposit_history_status = DepositHistoryStatus
         self._kline_interval = KlineInterval
         self._request_handler = RequestHandler(api_key = api_key,
                                                api_secret = api_secret,
@@ -53,7 +55,9 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._order_status = OrderStatus
         self._order_type = OrderType
         self._time_in_force = TimeInForce
-        #self._add_apikey_to_header()
+        self._transfer_type = TransferType
+        self._withdraw_history_status = WithrawHistoryStatus
+        
 
     @property
     def KLINE_INTERVAL(self):
@@ -74,18 +78,33 @@ class AuthenticatedClient(MarketDataEndpoints,
     @property
     def ORDER_STATUS(self):
         return self._order_status
-    
-    @property
-    def TIME_IN_FORCE(self):
-        return self._time_in_force
 
     @property
     def ORDER_RESPONSE_TYPE(self):
         return self._order_response_type
     
     @property
+    def TIME_IN_FORCE(self):
+        return self._time_in_force
+    
+    @property
     def request_handler(self):
         return self._request_handler
+
+    @property
+    @abstractmethod
+    def DEPOSIT_HISTORY_STATUS(self):
+        return self._deposit_history_status
+    
+    @property
+    @abstractmethod
+    def TRANSFER_TYPE(self):
+        return self._transfer_type
+
+    @property
+    @abstractmethod
+    def WITHDRAW_HISTORY_STATUS(self):
+        return self._withdraw_history_status
 
     def _create_api_uri(self, path: str, version=ApiVersion.PUBLIC) -> str:
         return self.API_URL.DEFAULT + '/' + version + '/' + path
@@ -95,7 +114,12 @@ class AuthenticatedClient(MarketDataEndpoints,
 
     def _create_futures_api_uri(self, path: str):
         return self.API_URL.FUTURES + '/' + self.FUTURES_API_VERSION + '/' + path
-    
+
+    def _create_wallet_v3_api_uri(self, path: str):
+        return self.API_URL.WALLET2 + '/' + self.API_VERSION.WALLET2 + '/' + path
+
+    def _create_wallet_v1_api_uri(self, path: str):
+        return self.API_URL.WALLET1 + '/' + self.API_VERSION.WALLET1 + '/' + path
     
 if __name__ == '__main__':
     pass
