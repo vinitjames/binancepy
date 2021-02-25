@@ -115,7 +115,8 @@ To fetch market data with binance market data endpointss use PublicClient. It ca
                                           startTime = '2/12/2018',
                                           endTime = '12/12/2019')
 
-
+Trading and Getting Account/Wallet Info with API keys  
+-----------------------------------------------------
 
 `Register an account with Binance <https://www.binance.com/register.html?ref=10099792>`_.
 
