@@ -68,7 +68,7 @@ To fetch market data with binance market data endpointss use PublicClient. It ca
     from binance.client import PublicClient
    
 
-	# creating a public client with default request params
+    # creating a public client with default request params
     client = PublicClient()
 
     
@@ -111,7 +111,7 @@ To fetch market data with binance market data endpointss use PublicClient. It ca
     #getting historical klines/candelstick for a symbol, 
         
     klines = client.get_historical_klines(symbol = 'ETHUSDT',
-				                          interval = client.KLINE_INTERVAL.ONEDAY,
+                                          interval = client.KLINE_INTERVAL.ONEDAY,
                                           startTime = '2/12/2018',
                                           endTime = '12/12/2019')
 
