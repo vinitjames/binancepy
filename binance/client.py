@@ -4,7 +4,7 @@ from .request_handler import RequestHandler
 from .utils import create_query_string, create_sorted_list, generate_signature
 from binance.endpoints.market_data import MarketDataEndpoints
 from binance.endpoints.spot_trade import SpotAccountTradeEndpoints
-from binance.endpoints.margin_trade import MarginAccountEndpoints
+from binance.endpoints.wallet import WalletEndpoints
 from typing import Union
 import time
 
@@ -92,17 +92,14 @@ class AuthenticatedClient(MarketDataEndpoints,
         return self._request_handler
 
     @property
-    @abstractmethod
     def DEPOSIT_HISTORY_STATUS(self):
         return self._deposit_history_status
     
     @property
-    @abstractmethod
     def TRANSFER_TYPE(self):
         return self._transfer_type
 
     @property
-    @abstractmethod
     def WITHDRAW_HISTORY_STATUS(self):
         return self._withdraw_history_status
 

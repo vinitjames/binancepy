@@ -40,13 +40,13 @@ class WalletEndpoints(metaclass = ABCMeta):
 
     def get_system_status(self) -> dict:
         uri = self._create_wallet_v3_api_uri('systemStatus.html')
-        return self.request_handler.get(uri, **params)
+        return self.request_handler.get(uri)
         
     def get_all_coin_info(self,
                           recvWindow: int = None)  -> dict:
         params = {}
-        if recWindow is not None:
-            params['recvWindow'] = recWindow
+        if recvWindow is not None:
+            params['recvWindow'] = recvWindow
         uri = self._create_wallet_v1_api_uri('capital/config/getall')
         return self.request_handler.get(uri, signed=True, **params)    
 
@@ -71,8 +71,8 @@ class WalletEndpoints(metaclass = ABCMeta):
                                      recvWindow: int = None) -> dict:
 
         params = {}
-        if recWindow is not None:
-            params['recvWindow'] = recWindow
+        if recvWindow is not None:
+            params['recvWindow'] = recvWindow
         uri = self._create_wallet_v1_api_uri('account/disableFastWithdrawSwitch')
         return self.request_handler.post(uri, signed=True, **params)
 
@@ -80,8 +80,8 @@ class WalletEndpoints(metaclass = ABCMeta):
                                     recvWindow: int = None) -> dict:
 
         params = {}
-        if recWindow is not None:
-            params['recvWindow'] = recWindow
+        if recvWindow is not None:
+            params['recvWindow'] = recvWindow
         params = {k : v for k, v in params.items() if v is not None}
         uri = self._create_wallet_v1_api_uri('account/enableFastWithdrawSwitch')
         return self.request_handler.post(uri, signed=True, **params)
@@ -153,10 +153,10 @@ class WalletEndpoints(metaclass = ABCMeta):
         if(startTime is None) and (endTime is None):
             return None
         if(startTime is None):
-            startTime = int(time.time() * 1000) - 90*24*3600
+            startTime = int(time.time() - 90*24*3600) * 1000
         if(endTime is None):
-            endTime = get_timestamp()
-        if (endTime-startTime) > 24*3600*90:
+            endTime = int(time.time() * 1000)
+        if (endTime-startTime) > 24*3600*90*1000 :
             raise WalletError("History Timeline should be less than 90" 
                               "days i.e endTime - startTime < 90 days")
 
@@ -175,7 +175,7 @@ class WalletEndpoints(metaclass = ABCMeta):
                            recvWindow: int = None) -> dict:
 
         params = {}
-        if(recWindow is not None):
+        if(recvWindow is not None):
             params['recvWindow'] = recvWindow
         params = {k : v for k, v in params.items() if v is not None}
         uri = self._create_wallet_v3_api_uri('accountStatus.html')
@@ -185,7 +185,7 @@ class WalletEndpoints(metaclass = ABCMeta):
                                        recvWindow: int = None) -> dict:
 
         params = {}
-        if(recWindow is not None):
+        if(recvWindow is not None):
             params['recvWindow'] = recvWindow
         params = {k : v for k, v in params.items() if v is not None}
         uri = self._create_wallet_v3_api_uri('apiTradingStatus.html')
@@ -196,7 +196,7 @@ class WalletEndpoints(metaclass = ABCMeta):
                      recvWindow: int = None) -> dict:
 
         params = {}
-        if(recWindow is not None):
+        if(recvWindow is not None):
             params['recvWindow'] = recvWindow
         params = {k : v for k, v in params.items() if v is not None}
         uri = self._create_wallet_v3_api_uri('userAssetDribbletLog.html')
@@ -233,7 +233,7 @@ class WalletEndpoints(metaclass = ABCMeta):
                          recvWindow: int = None) -> dict:
 
         params = {}
-        if(recWindow is not None):
+        if(recvWindow is not None):
             params['recvWindow'] = recvWindow
         uri = self._create_wallet_v3_api_uri('assetDetail.html')
         return self.request_handler.get(uri, signed=True, **params)
