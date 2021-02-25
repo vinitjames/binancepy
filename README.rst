@@ -67,53 +67,42 @@ To fetch market data with binance market data endpointss use PublicClient. It ca
 
     from binance.client import PublicClient
    
-
     # creating a public client with default request params
     client = PublicClient()
-
     
     #getting server time
     result = client.get_server_time()
-
     
     # getting exchange info
     ex_info = client.get_exchange_info()
 
-
     # getting exchange info
     sym_info = client.get_symbol_info(symbol='ETHEUR')
-
     
     #getting price_ticker if symbol not included value for all symbols are returned
     price_ticker = client.get_price_ticker(symbol='ETHEUR')
 
-
     #getting orderbook ticker if symbol not included value for all symbols are returned
     orderbook_ticker = client.get_orderbook_ticker(symbol='ETHEUR')
     
-
     #getting orderbook for a symbol        
     orderbook = client.get_order_book(symbol='ETHEUR', limit = 10)
-
 	
     #getting average price, for the specified symbol
     avg_price = client.get_avg_price('ETHEUR')
  
-   
     #getting 24hr price ticker, if symbol not included value for all symbols are returned
     _24_hr_ticker = client.get_24hr_ticker('ETHEUR')
-    
-
+	
     #getting recent trades for a symbol    
     recent_trades = client.get_recent_trades('ETHEUR', limit=5)
-    
-
-    #getting historical klines/candelstick for a symbol, 
-        
+				
+    #getting historical klines/candelstick for a symbol,         
     klines = client.get_historical_klines(symbol = 'ETHUSDT',
                                           interval = client.KLINE_INTERVAL.ONEDAY,
                                           startTime = '2/12/2018',
                                           endTime = '12/12/2019')
+
 
 Trading and Getting Account/Wallet Info with API keys  
 -----------------------------------------------------
