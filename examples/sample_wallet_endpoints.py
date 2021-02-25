@@ -25,13 +25,22 @@ if __name__ == '__main__':
     #print(client.enable_fast_withdraw_switch())
     
     #get wallet withdraw history for all coins 
-    print(client.get_withdraw_history(coin = 'ETH', startTime = '1.1.2021' , endTime = '22.2.2021'))
+    print(client.get_withdraw_history(coin='ETH',
+                                      status=client.DEPOSIT_HISTORY_STATUS.SUCCESS,
+                                      startTime='1.1.2021' ,
+                                      endTime='22.2.2021'))
 
     #get wallet deposit history for all coins
-    print(client.get_deposit_history(coin = 'BTC', startTime = '1.1.2021' , endTime = '1.1.2021'))
+    print(client.get_deposit_history(coin='BTC',
+                                     status=client.WITHDRAW_HISTORY_STATUS.COMPLETED,
+                                     startTime='1.1.2021',
+                                     endTime='1.1.2021'))
 
     #get account status
     print(client.get_account_status())
+
+    #get deposit address
+    print(client.get_deposit_address(coin='BTC'))
 
     #get account API trading status
     print(client.get_account_API_trading_status())
