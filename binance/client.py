@@ -57,7 +57,7 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._time_in_force = TimeInForce
         self._transfer_type = TransferType
         self._withdraw_history_status = WithrawHistoryStatus
-        
+        self._wallet_type = WalletType
 
     @property
     def KLINE_INTERVAL(self):
@@ -98,6 +98,10 @@ class AuthenticatedClient(MarketDataEndpoints,
     @property
     def TRANSFER_TYPE(self):
         return self._transfer_type
+
+    @property
+    def WALLET_TYPE(self):
+        return self._wallet_type
 
     @property
     def WITHDRAW_HISTORY_STATUS(self):

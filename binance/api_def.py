@@ -113,6 +113,11 @@ class WithrawHistoryStatus(object):
     FAILURE           = 5
     COMPLETED         = 6
     
+class WalletType(object):
+    SPOT    = 'SPOT'
+    MARGIN  = 'MARGIN'
+    FUTURES = 'FUTURES'
+    
 # websocket depths
 WEBSOCKET_DEPTH_5 = '5'
 WEBSOCKET_DEPTH_10 = '10'

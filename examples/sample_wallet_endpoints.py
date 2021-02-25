@@ -15,7 +15,7 @@ if __name__ == '__main__':
     print(client.get_all_coin_info())
 
     #checking wallet account snapshot for current day
-    print(client.get_daily_account_snapshot(type = "SPOT",
+    print(client.get_daily_account_snapshot(type = client.WALLET_TYPE.SPOT,
                                             limit = 1))
     
     #checking wallet account disable fast withdraw switch

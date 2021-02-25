@@ -30,6 +30,11 @@ class WalletEndpoints(metaclass = ABCMeta):
     def WITHDRAW_HISTORY_STATUS(self):
         pass
 
+    @property
+    @abstractmethod
+    def WALLET_TYPE(self):
+        pass
+
     @abstractmethod 
     def _create_wallet_v1_api_uri(self, path: str):
         pass
