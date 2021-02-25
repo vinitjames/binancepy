@@ -43,12 +43,12 @@ Quick Start
 `Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
 
 
-.. code:: bash
+.. code-block:: bash
 
 pip install binancepy
 
 
-.. code:: python
+.. code-block:: python
 
 from binance.client import Client
 client = Client(api_key, api_secret)
