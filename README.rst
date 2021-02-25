@@ -38,15 +38,29 @@ Features
 Quick Start
 -----------
 
-`Register an account with Binance <https://www.binance.com/register.html?ref=10099792>`_.
-
-`Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
-
+To install as Python package run 
 
 .. code-block:: bash
 
 	pip install binancepy
 
+Or clone the repo with git and install with version you want
+
+.. code-block:: bash
+				
+	git clone -b 'branch name' https://github.com/vinitjames/binancepy.git
+	cd binancepy
+	pip install .
+
+Test the sample public client which does not require api keys
+
+.. code-block:: bash
+				
+	python examples/sample_public_client.py
+
+`Register an account with Binance <https://www.binance.com/register.html?ref=10099792>`_.
+
+`Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
 
 .. code-block:: python
 
