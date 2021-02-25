@@ -22,18 +22,17 @@ Make sure you update often and check the `Changelog <https://python-binance.read
 
 Features
 --------
-
-- Implementation of all General, Market Data and Account endpoints.
-- Simple handling of authentication
+  
+- Implementation of  Market Data, Trading and Wallet endpoints
+- Market Data Endpoints accesible without binance api key
 - No need to generate timestamps yourself, the wrapper does it for you
 - Response exception handling
-- Websocket handling with reconnection and multiplexed connections
-- Symbol Depth Cache
 - Historical Kline/Candle fetching function
-- Withdraw functionality
-- Deposit addresses
+- Simple handling of authentication
+- Spot Trading
 - Margin Trading
 - Futures Trading
+- Wallet Info and Transfer functionality 
 - Support other domains (.us, .jp, etc)
 					  
 Quick Start
@@ -44,12 +43,12 @@ Quick Start
 `Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
 
 
- .. code:: bash
+.. code:: bash
 
 pip install binancepy
 
 
- .. code:: python
+.. code:: python
 
 from binance.client import Client
 client = Client(api_key, api_secret)
