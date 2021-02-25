@@ -15,8 +15,7 @@ setup(
                           'cryptography',
                           'ujson',
                           'dateparser',
-                          'pytz',
-                          'requests'],
+                          'pytz'],
         keywords='binance exchange rest api bitcoin ethereum btc eth neo',
         classifiers=[
                     'Intended Audience :: Developers',
