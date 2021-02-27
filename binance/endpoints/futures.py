@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Union
 from binance.utils import format_time, interval_to_ms
-from binance.exceptions import SpotTradingError
+from binance.exceptions import FuturesTradingError
 
 class FuturesEndpoints(metaclass = ABCMeta):
 
