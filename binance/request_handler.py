@@ -1,4 +1,4 @@
-from .exceptions import BinanceAPIException, BinanceRequestException, RequestHandlerError
+from .exceptions import BinanceAPIError, BinanceRequestError, RequestHandlerError
 from .utils import create_query_string, create_sorted_list, generate_signature
 from requests import Session
 from requests.models import Response 
@@ -74,10 +74,9 @@ class RequestHandler(object):
         if(type(response) != Response):
             raise RequestHandlerError(
                 " _handle_response called with an argument  which is not of type Response")
-        if(not str(response.status_code).startswith('2')):
-            raise BinanceAPIException(response)
-
+        if not (200 <= response.status_code < 300):
+            raise BinanceAPIError(response)
         try:
             return response.json()
         except ValueError:
-            raise BinanceRequestException(response)
+            raise BinanceRequestError("Invalid Response: {}".format(response.text))

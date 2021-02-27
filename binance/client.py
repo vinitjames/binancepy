@@ -1,5 +1,4 @@
 from .api_def import *
-from .exceptions import BinanceAPIException, BinanceRequestException
 from .request_handler import RequestHandler
 from .utils import create_query_string, create_sorted_list, generate_signature
 from binance.endpoints.market_data import MarketDataEndpoints
