@@ -2,6 +2,7 @@ from .api_def import *
 from .request_handler import RequestHandler
 from .utils import create_query_string, create_sorted_list, generate_signature
 from binance.endpoints.market_data import MarketDataEndpoints
+from binance.endpoints.margin_trade import MarginAccountEndpoints
 from binance.endpoints.spot_trade import SpotAccountTradeEndpoints
 from binance.endpoints.wallet import WalletEndpoints
 from typing import Union
@@ -31,9 +32,9 @@ class PublicClient(MarketDataEndpoints):
 
  
 class AuthenticatedClient(MarketDataEndpoints,
+                          MarginAccountEndpoints,
                           SpotAccountTradeEndpoints,
-                          WalletEndpoints
-                          ):
+                          WalletEndpoints):
 
     def __init__(self,
                  api_key: str,
@@ -53,6 +54,7 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._order_side = OrderSide
         self._order_status = OrderStatus
         self._order_type = OrderType
+        self._side_effect_type = SideEffectType
         self._time_in_force = TimeInForce
         self._transfer_type = TransferType
         self._withdraw_history_status = WithrawHistoryStatus
@@ -83,6 +85,10 @@ class AuthenticatedClient(MarketDataEndpoints,
         return self._order_response_type
     
     @property
+    def SIDE_EFFECT_TYPE(self):
+        return self._side_effect_type
+    
+    @property
     def TIME_IN_FORCE(self):
         return self._time_in_force
     
@@ -109,7 +115,7 @@ class AuthenticatedClient(MarketDataEndpoints,
     def _create_api_uri(self, path: str, version=ApiVersion.PUBLIC) -> str:
         return self.API_URL.DEFAULT + '/' + version + '/' + path
 
-    def __create_margin_api_uri(self, path: str):
+    def _create_margin_api_uri(self, path: str):
         return self.API_URL.MARGIN + '/' + self.API_VERSION.MARGIN + '/' + path
 
     def _create_futures_api_uri(self, path: str):
