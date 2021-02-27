@@ -63,7 +63,13 @@ class OrderType(object):
 class OrderSide(object):
     BUY  = 'BUY'
     SELL = 'SELL'
-
+    
+class SideEffectType(object):
+    NO_SIDE_EFFECT = 'NO_SIDE_EFFECT'
+    MARGIN_BUY     = 'MARGIN_BUY'
+    AUTO_REPAY     = 'AUTO_REPAY'
+    NO_SIDE_EFFECT = 'NO_SIDE_EFFECT'
+    
 class TimeInForce(object):
     GTC = 'GTC'  # Good till cancelled
     IOC = 'IOC'  # Immediate or cancel
@@ -74,7 +80,7 @@ class OrderResponseType(object):
     RESULT = 'RESULT'
     FULL   = 'FULL'
 
-class TransferType(object):
+class MarginTransferType(object):
     MAIN_C2C        = 'MAIN_C2C'
     MAIN_UMFUTURE   = 'MAIN_UMFUTURE'
     MAIN_CMFUTURE   = 'MAIN_CMFUTURE'
@@ -98,7 +104,13 @@ class TransferType(object):
     MINING_UMFUTURE = 'MINING_UMFUTURE'
     MINING_C2C      = 'MINING_C2C'
     MINING_MARGIN   = 'MINING_MARGIN'
-        
+
+class FuturesTransferType(object):
+    SPOT_TO_USDT = 1
+    USDT_TO_SPOT = 2
+    SPOT_TO_COIN = 3
+    COIN_TO_SPOT = 4
+
 class DepositHistoryStatus(object):
     PENDING  = 0
     SUCCESS  = 1   

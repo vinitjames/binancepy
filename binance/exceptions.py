@@ -50,6 +50,15 @@ class MarginTradingError(Exception):
             return 'MarginTradingError has been raised'
         return 'MarginTradingError, {}'.format(self.message)
 
+class FuturesTradingError(Exception):
+    def __init__(self, message:str = None):
+        self.message = message
+
+    def __str__(self):
+        if self.message is None:
+            return 'FuturesTradingError has been raised'
+        return 'FuturesTradingError, {}'.format(self.message)
+
 class WalletError(Exception):
     def __init__(self, message:str = None):
         self.message = message
