@@ -13,7 +13,7 @@ Source code
 https://github.com/vinitjames/binancepy
 
 Documentation
-https://python-binance.readthedocs.io/en/latest/
+https://binancepy.readthedocs.io/en/latest/
 
 Binance API Telegram
 https://t.me/binance_api_english
