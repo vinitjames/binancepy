@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Union
 from binance.utils import format_time, interval_to_ms
+import time
+
 
 class MarketDataEndpoints(metaclass = ABCMeta):
 
@@ -123,11 +125,11 @@ class MarketDataEndpoints(metaclass = ABCMeta):
         params['startTime'] = format_time(params['startTime'])
         params['startTime'] = max(earliest_timestamp, params[
             'startTime'])
-        if(params['endTime'] != None):
+        if(params['endTime'] is not None):
             params['endTime'] = format_time(params['endTime'])
-        if(params['endTime'] != None) and(params['startTime'] > params['endTime']):
+        if(params['endTime'] is not None) and (params['startTime'] > params['endTime']):
             raise ValueError('startTime entered is greater than endTime')
-        params = {k:v for k,v in params.items() if v is not None}
+        params = {k: v for k, v in params.items() if v is not None}
         params['limit'] = 500
         data = []
         api_call_count = 0

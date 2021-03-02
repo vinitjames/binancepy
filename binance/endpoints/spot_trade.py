@@ -1,9 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from typing import Union
-from binance.utils import format_time, interval_to_ms
+from binance.utils import format_time
 from binance.exceptions import SpotTradingError
 
-class SpotAccountTradeEndpoints(metaclass = ABCMeta):
+
+class SpotAccountTradeEndpoints(metaclass=ABCMeta):
 
     @property
     @abstractmethod
@@ -41,7 +42,7 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
         pass
     
     @abstractmethod
-    def _create_api_uri(self, path: str, version:str) -> str:
+    def _create_api_uri(self, path: str, version: str) -> str:
         pass
 
     def create_order(self,
@@ -98,7 +99,7 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
         params = locals()
         del params['self']
         if(params['orderId'] == None) and (params['origClientOrderId'] == None):
-            raise SpotAccountTradeError(
+            raise SpotTradingError(
                 'Atleast on of orderId or origClientOrderId not passed',
                 'for cancelling order')
         params = {k: v for k, v in params.items() if v is not None}
@@ -264,7 +265,6 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
         params['type'] = self.ORDER_TYPE.MARKET
         return self.create_order(**params)
 
-
     def market_sell_order(self,
                           symbol: str,
                           quantity: int = None,
@@ -303,7 +303,7 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
     def stoploss_sell_order(self,
                             symbol: str,
                             quantity: int,
-                            stopPrice:str,
+                            stopPrice: str,
                             timeInForce: str = None,
                             quoteOrderQty: int = None, 
                             newClientOrderId: str = None,
@@ -319,15 +319,15 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
 
     def stoploss_limit_buy_order(self,
                                  symbol: str,
-                                 price:str,
+                                 price: str,
                                  quantity: int,
                                  timeInForce: str,
-                                 stopPrice:str,
-                                 quoteOrderQty: int = None, 
+                                 stopPrice: str,
+                                 quoteOrderQty: int = None,
                                  newClientOrderId: str = None,
                                  icebergQty: float = None,
                                  newOrderRespType: str = None,
-                                 recvWindow: int = None) -> dict :
+                                 recvWindow: int = None) -> dict:
         
         params = locals()
         del params['self']
@@ -504,9 +504,8 @@ class SpotAccountTradeEndpoints(metaclass = ABCMeta):
 
         params = locals()
         del params['self']
-        if(param['formId'] is not None)and(
-                (param['startTime'] is not None) or
-                (param['endTime'] is not None)):
+        if(params['formId'] is not None) and (
+                (params['startTime'] is not None) or (params['endTime'] is not None)):
             raise SpotTradingError("All OCO orders called with both formId and startTime/endTime ")
         if params['startTime'] is not None:
             params['startTime'] = format_time(params['startTime'])

@@ -2,6 +2,8 @@ from abc import ABCMeta, abstractmethod
 from typing import Union
 from binance.utils import format_time, interval_to_ms
 from binance.exceptions import WalletError
+import time
+
 
 class WalletEndpoints(metaclass = ABCMeta):
 
@@ -161,7 +163,7 @@ class WalletEndpoints(metaclass = ABCMeta):
             startTime = int(time.time() - 90*24*3600) * 1000
         if(endTime is None):
             endTime = int(time.time() * 1000)
-        if (endTime-startTime) > 24*3600*90*1000 :
+        if (endTime-startTime) > 24*3600*90*1000:
             raise WalletError("History Timeline should be less than 90" 
                               "days i.e endTime - startTime < 90 days")
 

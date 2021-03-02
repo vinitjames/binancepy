@@ -1,22 +1,23 @@
-from .api_def import *
+from .api_def import ApiUrl, ApiVersion
+from .api_def import KlineInterval, DepositHistoryStatus
+from .api_def import OrderResponseType, OrderSide, OrderStatus, OrderType
+from .api_def import SideEffectType, TimeInForce, TransferType
+from .api_def import WithrawHistoryStatus, WalletType
 from .request_handler import RequestHandler
-from .utils import create_query_string, create_sorted_list, generate_signature
 from binance.endpoints.market_data import MarketDataEndpoints
 from binance.endpoints.margin_trade import MarginAccountEndpoints
 from binance.endpoints.spot_trade import SpotAccountTradeEndpoints
 from binance.endpoints.wallet import WalletEndpoints
-from typing import Union
-import time
+
 
 class PublicClient(MarketDataEndpoints):
 
     def __init__(self,
-                 endpoint_version: str = '',
-                 request_params: dict = None,
-                 tld: str = 'com'):
-        
+                 endpoint_version: str='',
+                 request_params: dict=None,
+                 tld: str='com'):       
         self.API_URL = ApiUrl(endpoint_version, tld)
-        self._request_handler = RequestHandler(request_params = request_params)
+        self._request_handler = RequestHandler(request_params=request_params)
         self._kline_interval = KlineInterval
 
     @property
@@ -39,17 +40,17 @@ class AuthenticatedClient(MarketDataEndpoints,
     def __init__(self,
                  api_key: str,
                  api_secret: str,
-                 endpoint_version: str = '',
-                 request_params: dict = None,
-                 tld: str = 'com'):
+                 endpoint_version: str='',
+                 request_params: dict=None,
+                 tld: str='com'):
 
         self.API_URL = ApiUrl(endpoint_version, tld)
         self._api_version = ApiVersion
         self._deposit_history_status = DepositHistoryStatus
         self._kline_interval = KlineInterval
-        self._request_handler = RequestHandler(api_key = api_key,
-                                               api_secret = api_secret,
-                                               request_params = request_params)
+        self._request_handler = RequestHandler(api_key=api_key,
+                                               api_secret=api_secret,
+                                               request_params=request_params)
         self._order_response_type = OrderResponseType
         self._order_side = OrderSide
         self._order_status = OrderStatus
@@ -126,6 +127,7 @@ class AuthenticatedClient(MarketDataEndpoints,
 
     def _create_wallet_v1_api_uri(self, path: str):
         return self.API_URL.WALLET1 + '/' + self.API_VERSION.WALLET1 + '/' + path
+
     
 if __name__ == '__main__':
     pass

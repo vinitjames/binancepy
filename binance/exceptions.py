@@ -1,5 +1,6 @@
 from requests.models import Response
 
+
 class BinanceAPIError(Exception):
     def __init__(self, response: Response):
         self.code = 0
@@ -16,14 +17,18 @@ class BinanceAPIError(Exception):
     def __str__(self):
         return 'Binance API Error(code={}): {}'.format(self.code, self.messaage)
 
+    
 class BinanceRequestError(Exception):
+
     def __init__(self, message):
         self.message = message
 
     def __str__(self):
         return 'BinanceRequestError: {}'.format(self.message)
 
+    
 class RequestHandlerError(Exception):
+
     def __init__(self, message:str = None):
         self.message = message
 
@@ -32,7 +37,9 @@ class RequestHandlerError(Exception):
             return 'RequestHandlerError has been raised'
         return 'RequestHandlerError, {}'.format(self.message)
 
+    
 class SpotTradingError(Exception):
+
     def __init__(self, message:str = None):
         self.message = message
 
@@ -41,7 +48,9 @@ class SpotTradingError(Exception):
             return 'SpotTradingError has been raised'
         return 'SpotTradingError, {}'.format(self.message)
 
+    
 class MarginTradingError(Exception):
+
     def __init__(self, message:str = None):
         self.message = message
 
@@ -50,7 +59,9 @@ class MarginTradingError(Exception):
             return 'MarginTradingError has been raised'
         return 'MarginTradingError, {}'.format(self.message)
 
+    
 class FuturesTradingError(Exception):
+
     def __init__(self, message:str = None):
         self.message = message
 
@@ -59,7 +70,9 @@ class FuturesTradingError(Exception):
             return 'FuturesTradingError has been raised'
         return 'FuturesTradingError, {}'.format(self.message)
 
+    
 class WalletError(Exception):
+
     def __init__(self, message:str = None):
         self.message = message
 
@@ -67,6 +80,7 @@ class WalletError(Exception):
         if self.message is None:
             return 'WalletError has been raised'
         return 'WalletError, {}'.format(self.message)
+
     
 if __name__ == '__main__':
     pass

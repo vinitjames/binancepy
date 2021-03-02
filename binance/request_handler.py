@@ -61,13 +61,13 @@ class RequestHandler(object):
         if not self.authenticated:
             raise RequestHandlerError(
                 "Unauthenticated client issued a PUT http request")
-        return self._request('put', path, signed, version, **kwargs)
+        return self._request('put', path, signed, **kwargs)
 
     def delete(self, path, signed=False, **kwargs):
         if not self.authenticated:
             raise RequestHandler(
                 "Unauthenticated client issued a DELETE http request")
-        return self._request('delete', path, signed, version, **kwargs)
+        return self._request('delete', path, signed, **kwargs)
 
     @classmethod
     def _handle_response(cls, response: Response) -> dict:
