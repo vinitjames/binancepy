@@ -3,8 +3,6 @@ BinancePy
 ================================
 .. image:: https://img.shields.io/pypi/v/binancepy?color=blue
     :target:  https://pypi.org/project/binancepy/
-			  
-|
 
 .. image:: https://img.shields.io/github/license/vinitjames/binancepy
     :target:  https://github.com/vinitjames/binancepy/blob/master/LICENSE
