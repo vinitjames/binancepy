@@ -173,4 +173,4 @@ Trading and Getting Account/Wallet Info with API keys
 	# fetch weekly klines since it listed
 	klines = client.get_historical_klines("NEOBTC", Client.KLINE_INTERVAL_1WEEK, "1 Jan, 2017")
 
-For more `check out the documentation <https://python-binance.readthedocs.io/en/latest/>`_.
+For more `check out the documentation <https://binancepy.readthedocs.io/en/latest/>`_.
