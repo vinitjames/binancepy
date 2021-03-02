@@ -1,7 +1,7 @@
 from .api_def import ApiUrl, ApiVersion
 from .api_def import KlineInterval, DepositHistoryStatus
 from .api_def import OrderResponseType, OrderSide, OrderStatus, OrderType
-from .api_def import SideEffectType, TimeInForce, TransferType
+from .api_def import SideEffectType, TimeInForce 
 from .api_def import WithrawHistoryStatus, WalletType
 from .request_handler import RequestHandler
 from binance.endpoints.market_data import MarketDataEndpoints
@@ -57,7 +57,6 @@ class AuthenticatedClient(MarketDataEndpoints,
         self._order_type = OrderType
         self._side_effect_type = SideEffectType
         self._time_in_force = TimeInForce
-        self._transfer_type = TransferType
         self._withdraw_history_status = WithrawHistoryStatus
         self._wallet_type = WalletType
 
@@ -100,10 +99,6 @@ class AuthenticatedClient(MarketDataEndpoints,
     @property
     def DEPOSIT_HISTORY_STATUS(self):
         return self._deposit_history_status
-    
-    @property
-    def TRANSFER_TYPE(self):
-        return self._transfer_type
 
     @property
     def WALLET_TYPE(self):

@@ -24,11 +24,6 @@ class WalletEndpoints(metaclass = ABCMeta):
     
     @property
     @abstractmethod
-    def TRANSFER_TYPE(self):
-        pass
-
-    @property
-    @abstractmethod
     def WITHDRAW_HISTORY_STATUS(self):
         pass
 
