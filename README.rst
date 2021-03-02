@@ -1,6 +1,9 @@
 ================================
 BinancePy  
 ================================
+.. image:: https://img.shields.io/github/workflow/status/vinitjames/binancepy/Python%20package?color=green%20
+    :target:  https://github.com/vinitjames/binancepy/actions
+			  
 .. image:: https://img.shields.io/pypi/v/binancepy?color=blue
     :target:  https://pypi.org/project/binancepy/
 
