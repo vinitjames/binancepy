@@ -68,7 +68,7 @@ To run  the sample public client which does not require api keys run the command
 Fetching Market Data
 --------------------
 
-To fetch market data with binance market data endpointss use PublicClient. It can be used without an API key
+To fetch market data with binance market data endpoints both PublicClient and AuthenticatedClient can be used. PublicClient can be used without without an API key.
 
 .. code-block:: python
 
@@ -113,16 +113,17 @@ To fetch market data with binance market data endpointss use PublicClient. It ca
 
 Trading and Getting Account/Wallet Info with API keys  
 -----------------------------------------------------
-
+To use trading(Spot, Margin, Future) and wallet endpoints a binance account create a binance account.  
 `Register an account with Binance <https://www.binance.com/register.html?ref=10099792>`_.
+
 
 `Generate an API Key <https://www.binance.com/userCenter/createApi.html>`_ and assign relevant permissions.
 
 .. code-block:: python
 
-    from binance.client import Client
+    from binance.client import AuthenticatedClient
    
-    client = Client(api_key, api_secret)
+    client = AuthenticatedClient(api_key, api_secret)
 
     # get market depth
     depth = client.get_order_book(symbol='BNBBTC')
@@ -139,7 +140,7 @@ Trading and Getting Account/Wallet Info with API keys
 
    # withdraw 100 ETH
    # check docs for assumptions around withdrawals
-   from binance.exceptions import BinanceAPIException, BinanceWithdrawException
+   from binance.exceptions import BinanceAPIError, BinanceWithdrawError
 
    try:
      result = client.withdraw(
@@ -168,16 +169,5 @@ Trading and Getting Account/Wallet Info with API keys
 	     print("message type: {}".format(msg['e']))
 		 print(msg)
 		 
-
-	# get historical kline data from any date range
-
-	# fetch 1 minute klines for the last day up until now
-	klines = client.get_historical_klines("BNBBTC", Client.KLINE_INTERVAL_1MINUTE, "1 day ago UTC")
-
-	# fetch 30 minute klines for the last month of 2017
-	klines = client.get_historical_klines("ETHBTC", Client.KLINE_INTERVAL_30MINUTE, "1 Dec, 2017", "1 Jan, 2018")
-
-	# fetch weekly klines since it listed
-	klines = client.get_historical_klines("NEOBTC", Client.KLINE_INTERVAL_1WEEK, "1 Jan, 2017")
 
 For more `check out the documentation <https://binancepy.readthedocs.io/en/latest/>`_.
