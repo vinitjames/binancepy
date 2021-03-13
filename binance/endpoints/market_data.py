@@ -17,7 +17,7 @@ class MarketDataEndpoints(metaclass = ABCMeta):
         pass
     
     @abstractmethod
-    def _create_api_uri(self, path: str, version:str) -> str:
+    def _create_api_uri(self, path: str, version: str) -> str:
         pass
         
     def ping(self) -> dict:
@@ -47,7 +47,7 @@ class MarketDataEndpoints(metaclass = ABCMeta):
 
     def get_orderbook_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/bookTicker')
-        if(symbol == None):
+        if(symbol is None):
             return self.request_handler.get(uri)
         return self.request_handler.get(uri, symbol=symbol)
 
@@ -77,11 +77,11 @@ class MarketDataEndpoints(metaclass = ABCMeta):
                        limit: int = 500):
         params = locals()
         del params['self']
-        if(params['startTime'] != None):
+        if(params['startTime'] is not None):
             params['startTime'] = format_time(params['startTime'])
-        if(params['endTime'] != None):
+        if(params['endTime'] is not None):
             params['endTime'] = format_time(params['endTime'])
-        params = {k:v for k,v in params.items() if v is not None}
+        params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('aggTrades')
         return self.request_handler.get(uri, **params)
 
@@ -94,15 +94,15 @@ class MarketDataEndpoints(metaclass = ABCMeta):
         
         params = locals()
         del params['self']
-        if(params['startTime'] != None):
+        if(params['startTime'] is not None):
             params['startTime'] = format_time(params['startTime'])
-        if(params['endTime'] != None):
+        if(params['endTime'] is not None):
             params['endTime'] = format_time(params['endTime'])
-        params = {k:v for k,v in params.items() if v is not None}
+        params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('klines')
         return self.request_handler.get(uri, **params)
 
-    def _get_earliest_valid_timestamp(self, symbol:str, interval:str):
+    def _get_earliest_valid_timestamp(self, symbol: str, interval: str):
                 
         kline = self.get_klines(
             symbol=symbol,
