@@ -535,12 +535,12 @@ class SpotAccountTradeEndpoints(metaclass=ABCMeta):
 
     def get_trade_list(self,
                        symbol: str,
-                       orderId: int = None,
+                       formId: int = None,
                        startTime: Union[int, str] = 0,
                        endTime: Union[int, str] = None) -> dict:
         
         params = locals()
-        del params['self']    
+        del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         return self._get_historical_data(self._get_trade_list, **params)
         
@@ -553,9 +553,11 @@ class SpotAccountTradeEndpoints(metaclass=ABCMeta):
                         recvWindow: int = None) -> dict:
 
         params = locals()
+        del params['self']
         params = {k: v for k, v in params.items() if v is not None}
         uri = self._create_api_uri('myTrades',
                                    version=self.API_VERSION.PRIVATE)
+        print(params)
         return self.request_handler.get(uri, signed=True, **params)
 
     def _get_historical_data(self,
@@ -574,8 +576,8 @@ class SpotAccountTradeEndpoints(metaclass=ABCMeta):
             endTime = format_time(endTime)
             if(startTime > endTime):
                 raise ValueError('startTime entered is greater than endTime')
-        limit = 500
         data = []
+        limit = 500
         api_call_count = 0
         while(True):
             fetched_data = func(symbol,
