@@ -4,6 +4,7 @@ from requests import Session
 from requests.models import Response 
 import time
 
+
 class RequestHandler(object):
     def __init__(self,
                  api_key: str = None,
@@ -28,8 +29,9 @@ class RequestHandler(object):
                  method: str,
                  uri: str,
                  signed: bool = False,
-                 forced_params=False,
+                 forced_params = False,
                  **params):
+        
         kwargs = {}
         kwargs['timeout'] = 10
         if self.request_params:

@@ -40,9 +40,9 @@ class AuthenticatedClient(MarketDataEndpoints,
     def __init__(self,
                  api_key: str,
                  api_secret: str,
-                 endpoint_version: str='',
-                 request_params: dict=None,
-                 tld: str='com'):
+                 endpoint_version: str = '',
+                 request_params: dict = None,
+                 tld: str = 'com'):
 
         self.API_URL = ApiUrl(endpoint_version, tld)
         self._api_version = ApiVersion
