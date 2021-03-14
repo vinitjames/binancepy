@@ -29,7 +29,7 @@ class RequestHandler(object):
                  method: str,
                  uri: str,
                  signed: bool = False,
-                 forced_params = False,
+                 forced_params=False,
                  **params):
         
         kwargs = {}
@@ -41,14 +41,15 @@ class RequestHandler(object):
             params = create_sorted_list(params)
             params.append(('timestamp', int(time.time() * 1000)))
             query_string = create_query_string(params)
-            params.append(('signature' , generate_signature(query_string=query_string,
-                                                            api_secret=self.api_secret)))
+            params.append(('signature', generate_signature(
+                query_string=query_string,
+                api_secret=self.api_secret)))
         kwargs['params'] = params
         response = getattr(self.session, method)(uri, **kwargs)
         return self._handle_response(response)
 
     def get(self, path, signed=False, **kwargs):
-        if not self.authenticated and signed == True:
+        if not self.authenticated and signed is True:
             raise RequestHandlerError(
                 "Unauthenticated client issued a signed GET http request")
         return self._request('get', path, signed, **kwargs)
