@@ -1,6 +1,8 @@
 import unittest
-from binance.utils import *
-from binance.api_def import *
+from binance.utils import create_sorted_list, create_query_string
+from binance.utils import format_time, interval_to_ms
+from binance.api_def import KlineInterval
+
 
 class TestUtils(unittest.TestCase):
 
@@ -19,13 +21,12 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(query_string.split('&')[0], ('test=1'))
         self.assertEqual(query_string.split('&')[1], ('dict=2'))
         self.assertEqual(query_string.split('&')[2], ('binance=api'))
-        test_list = [('test',1),('dict', 2),('binance','api')]
-        query_string = create_query_string(test_dict)
+        test_list = [('test', 1), ('dict', 2), ('binance', 'api')]
+        query_string = create_query_string(test_list)
         self.assertTrue(isinstance(query_string, str))
         self.assertEqual(query_string.split('&')[0], ('test=1'))
         self.assertEqual(query_string.split('&')[1], ('dict=2'))
         self.assertEqual(query_string.split('&')[2], ('binance=api'))
-        
         
     def test_interval_to_ms(self):
         kline_interval = KlineInterval
