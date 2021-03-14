@@ -18,13 +18,13 @@ class BinanceAPIError(Exception):
         return 'Binance API Error(code={}): {}'.format(self.code, self.messaage)
 
     
-class BinanceRequestError(Exception):
+class BinanceResponseError(Exception):
 
     def __init__(self, message):
         self.message = message
 
     def __str__(self):
-        return 'BinanceRequestError: {}'.format(self.message)
+        return 'BinanceResponseError: {}'.format(self.message)
 
     
 class RequestHandlerError(Exception):

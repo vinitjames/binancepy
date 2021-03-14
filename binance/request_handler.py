@@ -1,4 +1,5 @@
-from .exceptions import BinanceAPIError, BinanceRequestError, RequestHandlerError
+from .exceptions import BinanceAPIError, BinanceResponseError
+from .exceptions import RequestHandlerError
 from .utils import create_query_string, create_sorted_list, generate_signature
 from requests import Session
 from requests.models import Response
@@ -68,7 +69,7 @@ class RequestHandler(object):
 
     def delete(self, path, signed=False, **kwargs):
         if not self.authenticated:
-            raise RequestHandler(
+            raise RequestHandlerError(
                 "Unauthenticated client issued a DELETE http request")
         return self._request('delete', path, signed, **kwargs)
 
@@ -82,7 +83,7 @@ class RequestHandler(object):
         try:
             return response.json()
         except ValueError:
-            raise BinanceRequestError("Invalid Response: {}".format(response.text))
+            raise BinanceResponseError("Invalid Response: {}".format(response.text))
 
         
 if __name__ == '__main__':
