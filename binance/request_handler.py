@@ -1,7 +1,7 @@
 from .exceptions import BinanceAPIError, BinanceRequestError, RequestHandlerError
 from .utils import create_query_string, create_sorted_list, generate_signature
 from requests import Session
-from requests.models import Response 
+from requests.models import Response
 import time
 
 
@@ -82,3 +82,7 @@ class RequestHandler(object):
             return response.json()
         except ValueError:
             raise BinanceRequestError("Invalid Response: {}".format(response.text))
+
+        
+if __name__ == '__main__':
+    pass
