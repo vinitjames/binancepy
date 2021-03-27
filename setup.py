@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='binancepy',
-        version='0.0.1',
+        version='0.0.1-beta',
         packages= ['binance', 'binance.endpoints'],
         description='Binance REST API python implementation',
         url='https://github.com/vinitjames/binancepy',
