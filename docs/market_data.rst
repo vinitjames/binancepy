@@ -1,57 +1,71 @@
 Market Data Endpoints
 =====================
 
+`Create a client to access market data`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`Get Market Depth <binance.html#binance.client.Client.get_order_book>`_
----------------------------------------------------------------------
-
-.. code:: python
-
-		  depth = client.get_order_book(symbol='BNBBTC')
-
-`Get Recent Trades <binance.html#binance.client.Client.get_recent_trades>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: python
-
-    trades = client.get_recent_trades(symbol='BNBBTC')
-
-`Get Historical Trades <binance.html#binance.client.Client.get_historical_trades>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: python
-
-	trades = client.get_historical_trades(symbol='BNBBTC')
-
-`Get Aggregate Trades <binance.html#binance.client.Client.get_aggregate_trades>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: python
-
-	   trades = client.get_aggregate_trades(symbol='BNBBTC')
-
-`Aggregate Trade Iterator <binance.html#binance.client.Client.aggregate_trade_iter>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Iterate over aggregate trades for a symbol from a given date or a given order id.
-
+For accesing market data both PublicClient or AuthenticatedClient can be used but since AuthenticatedClient requires an API Key and API Secret it is simmpler to use PublicClient when only market data is needed form the API.
 .. code:: python
 		  
-	agg_trades = client.aggregate_trade_iter(symbol='ETHBTC', start_str='30 minutes ago UTC')
+		  from binance.client import PublicClient
+		  client = PublicClient()
 
-	# iterate over the trade iterator
-	for trade in agg_trades:
-		print(trade)
-	# do something with the trade data
+`Test Connectivity  <https://binance-docs.github.io/apidocs/spot/en/#test-connectivity>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	# convert the iterator to a list
-	# note: generators can only be iterated over once so we need to call it again
-	agg_trades = client.aggregate_trade_iter(symbol='ETHBTC', '30 minutes ago UTC')
-	agg_trade_list = list(agg_trades)
+.. code:: python
 
-	# example using last_id value
-	agg_trades = client.aggregate_trade_iter(symbol='ETHBTC', last_id=23380478)
-	agg_trade_list = list(agg_trades)
+		  client.ping()
+		  
+`Get Server Time  <https://binance-docs.github.io/apidocs/spot/en/#check-server-time>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+		 server_time =  client.get_server_time()
+		  
+`Get Exchange Information <https://binance-docs.github.io/apidocs/spot/en/#exchange-information>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+		  exchange_info = client.get_exchange_info()
+
+`Get Symbol Information `
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+		  symbol_info = client.get_symbol_info()
+
+
+`Get Order Book <https://binance-docs.github.io/apidocs/spot/en/#order-book>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    order_book = client.get_order_book(symbol='BNBBTC', limit=100)
+
+	
+`Get Recent Trades <https://binance-docs.github.io/apidocs/spot/en/#recent-trades-list>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    recent_trades = client.get_recent_trades(symbol='BNBBTC', limit=100)
+
+
+`Get Aggregate Trades <https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+	   trades = client.get_agg_trades(symbol='BNBBTC',
+	                                  formId=26129,
+									  startTime=1500541200,
+									  endTime=1500541250,
+									  limit=100)
+
 
 
 `Get Kline/Candlesticks <binance.html#binance.client.Client.get_klines>`_
@@ -78,45 +92,34 @@ Fetch klines for any date range and interval
    klines = client.get_historical_klines("NEOBTC", Client.KLINE_INTERVAL_1WEEK, "1 Jan, 2017")
 
 
-`Get Historical Kline/Candlesticks using a generator <binance.html#binance.client.Client.get_historical_klines_generator>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Fetch klines using a generator
 
-.. code:: python
-
-	for kline in client.get_historical_klines_generator("BNBBTC", Client.KLINE_INTERVAL_1MINUTE, "1 day ago UTC")
-	print(kline)
-	# do something with the kline
-
-	`Get average price for a symbol <binance.html#binance.client.Client.get_avg_price>`_
-	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Get Current average price for a symbol <https://binance-docs.github.io/apidocs/spot/en/#current-average-price>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
 	avg_price = client.get_avg_price(symbol='BNBBTC')
 
-`Get 24hr Ticker <binance.html#binance.client.Client.get_ticker>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Get 24hr Ticker price change statistics <https://binance-docs.github.io/apidocs/spot/en/#24hr-ticker-price-change-statistics>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
-	tickers = client.get_ticker()
+	tickers = client.get_24hr_ticker(symbol='BNBBTC')
 
-`Get All Prices <binance.html#binance.client.Client.get_all_tickers>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get last price for all markets.
-
-.. code:: python
-
-       prices = client.get_all_tickers()
-
-`Get Orderbook Tickers <binance.html#binance.client.Client.get_orderbook_tickers>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Get first bid and ask entry in the order book for all markets.
+`Get Symbol Ticker <https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
-       tickers = client.get_orderbook_tickers()
+	tickers = client.get_price_ticker(symbol='BNBBTC')
+	
+
+`Get Orderbook Tickers <https://binance-docs.github.io/apidocs/spot/en/#symbol-order-book-ticker>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+       tickers = client.get_orderbook_ticker(symbol='BNBBTC')

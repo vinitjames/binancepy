@@ -39,9 +39,13 @@ class MarketDataEndpoints(metaclass = ABCMeta):
                 return sym_data
         return None
 
+    def get_order_book(self, symbol: str, limit: int = 100):
+        uri = self._create_api_uri('depth')
+        return self.request_handler.get(uri, symbol=symbol, limit=limit)
+    
     def get_price_ticker(self, symbol: str = None) -> dict:
         uri = self._create_api_uri('ticker/price')
-        if(symbol == None):
+        if(symbol is None):
             return self.request_handler.get(uri)
         return self.request_handler.get(uri, symbol=symbol)
 
@@ -49,11 +53,7 @@ class MarketDataEndpoints(metaclass = ABCMeta):
         uri = self._create_api_uri('ticker/bookTicker')
         if(symbol is None):
             return self.request_handler.get(uri)
-        return self.request_handler.get(uri, symbol=symbol)
-
-    def get_order_book(self, symbol: str, limit: int = 100):
-        uri = self._create_api_uri('depth')
-        return self.request_handler.get(uri, symbol=symbol, limit=limit)
+        return self.request_handler.get(uri, symbol=symbol) 
 
     def get_avg_price(self, symbol: str) -> dict:
         #avg price does not work with v1
