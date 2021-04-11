@@ -1,8 +1,8 @@
 Market Data Endpoints
 =====================
 
-`Create a client to access market data`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Create a client to access market data`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For accesing market data both PublicClient or AuthenticatedClient can be used but since AuthenticatedClient requires an API Key and API Secret it is simmpler to use PublicClient when only market data is needed form the API.
 .. code:: python
@@ -10,29 +10,29 @@ For accesing market data both PublicClient or AuthenticatedClient can be used bu
 		  from binance.client import PublicClient
 		  client = PublicClient()
 
-`Test Connectivity  <https://binance-docs.github.io/apidocs/spot/en/#test-connectivity>`
+`Test Connectivity <https://binance-docs.github.io/apidocs/spot/en/#test-connectivity>`_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
 		  client.ping()
 		  
-`Get Server Time  <https://binance-docs.github.io/apidocs/spot/en/#check-server-time>`
+`Get Server Time <https://binance-docs.github.io/apidocs/spot/en/#check-server-time>`_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
 		 server_time =  client.get_server_time()
 		  
-`Get Exchange Information <https://binance-docs.github.io/apidocs/spot/en/#exchange-information>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Get Exchange Information <https://binance-docs.github.io/apidocs/spot/en/#exchange-information>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
 		  exchange_info = client.get_exchange_info()
 
-`Get Symbol Information `
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Get Symbol Information
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
@@ -69,7 +69,7 @@ For accesing market data both PublicClient or AuthenticatedClient can be used bu
 
 
 `Get Kline/Candlesticks <binance.html#binance.client.Client.get_klines>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
@@ -94,15 +94,15 @@ Fetch klines for any date range and interval
 
 
 
-`Get Current average price for a symbol <https://binance-docs.github.io/apidocs/spot/en/#current-average-price>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Get Current average price for a symbol <https://binance-docs.github.io/apidocs/spot/en/#current-average-price>`_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
 	avg_price = client.get_avg_price(symbol='BNBBTC')
 
 `Get 24hr Ticker price change statistics <https://binance-docs.github.io/apidocs/spot/en/#24hr-ticker-price-change-statistics>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
