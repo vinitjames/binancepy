@@ -4,7 +4,9 @@ Market Data Endpoints
 `Create a client to access market data`_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For accesing market data both PublicClient or AuthenticatedClient can be used but since AuthenticatedClient requires an API Key and API Secret it is simmpler to use PublicClient when only market data is needed form the API.
+For accesing market data both PublicClient or AuthenticatedClient can be used but since AuthenticatedClient requires an API Key and API Secret, it is simmpler to use PublicClient when only market data is needed.
+
+
 .. code:: python
 		  
 		  from binance.client import PublicClient
