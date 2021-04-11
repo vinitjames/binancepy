@@ -62,9 +62,9 @@ Get Symbol Information
 
 	   trades = client.get_agg_trades(symbol='BNBBTC',
 	                                  formId=26129,
-									  startTime=1500541200,
-									  endTime=1500541250,
-									  limit=100)
+                                      startTime=1500541200,
+                                      endTime=1500541250,
+                                      limit=100)
 
 
 
